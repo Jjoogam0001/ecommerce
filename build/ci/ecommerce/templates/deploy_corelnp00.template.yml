@@ -1,0 +1,10 @@
+parameters:
+- name: version
+  type: string
+
+jobs:
+- template: deploy/corelnp00/template.yml@templates
+  parameters:
+    application: 'ecommerce'
+    manifest: 'deployments/aks/manifests/corelnp00.yaml' 
+    container: 'sportsbookacr.azurecr.io/core/betting/ecommerce:${{ parameters.version }}'

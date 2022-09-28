@@ -1,0 +1,87 @@
+trigger:
+  paths:
+    include:
+    - .build/ci/ecommerce/azure-pipelines-dashboard.yml
+    - dashboards/ecommerce.json
+
+pool:
+   vmImage: 'ubuntu-latest'
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: Martsoft-Coreecommerce/bet-pipeline-templates
+
+variables:
+  isStable: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
+  shouldDeploy: $[or(eq(variables['Build.Reason'], 'Manual'), eq(variables.isStable, 'true'))]
+
+stages:
+  - stage: deploydev
+    displayName: Deploy to CORE-ALPHA00 Folder
+    condition: and(succeeded(), eq(variables.shouldDeploy, 'true'))
+    jobs:
+      - template: grafana/Martsoftgrafana/template.yml@templates
+        parameters:
+          dashboard_folder: 'ecommerce_COREALPHA00'
+          folderName: 'CORE-ALPHA00'
+          dashboardFilePath: 'dashboards/ecommerce.json'
+          preDeploy: 
+            - task: CmdLine@2
+              displayName: Set Dashboard Datasource
+              inputs:
+                script: |  
+                  sed -i 's/"datasource": "local"/"datasource": "AKS-core_alpha"/' "dashboards/ecommerce.json"
+                workingDirectory: '$(Build.SourcesDirectory)'
+
+  - stage: deploytest
+    displayName: Deploy to CORE-TEST00 Folder
+    condition: and(succeeded(), eq(variables.isStable, 'true'))
+    jobs:
+      - template: grafana/Martsoftgrafana/template.yml@templates
+        parameters:
+          dashboard_folder: 'ecommerce_CORETEST00'
+          folderName: 'CORE-TEST00'
+          dashboardFilePath: 'dashboards/ecommerce.json'
+          preDeploy: 
+            - task: CmdLine@2
+              displayName: Set Dashboard Datasource
+              inputs:
+                script: |  
+                  sed -i 's/"datasource": "local"/"datasource": "AKS-core_test00"/' "dashboards/ecommerce.json"
+                workingDirectory: '$(Build.SourcesDirectory)'
+
+  - stage: deploylnp
+    displayName: Deploy to CORE-LNP00 Folder
+    condition: and(succeeded(), eq(variables.isStable, 'true'))
+    jobs:
+      - template: grafana/Martsoftgrafana/template.yml@templates
+        parameters:
+          dashboard_folder: 'ecommerce_CORELNP00'
+          folderName: 'CORE-LNP00'
+          dashboardFilePath: 'dashboards/ecommerce.json'
+          preDeploy:
+            - task: CmdLine@2
+              displayName: Set Dashboard Datasource
+              inputs:
+                script: |
+                  sed -i 's/"datasource": "local"/"datasource": "AKS-core_lnp00"/' "dashboards/ecommerce.json"
+                workingDirectory: '$(Build.SourcesDirectory)'
+
+  - stage: deployprod
+    displayName: Deploy to CORE-PROD00 Folder
+    condition: and(succeeded(), eq(variables.isStable, 'true'))
+    jobs:
+      - template: grafana/Martsoftgrafana/template.yml@templates
+        parameters:
+          dashboard_folder: 'ecommerce_COREPROD00'
+          folderName: 'CORE-PROD00'
+          dashboardFilePath: 'dashboards/ecommerce.json'
+          preDeploy: 
+            - task: CmdLine@2
+              displayName: Set Dashboard Datasource
+              inputs:
+                script: |  
+                  sed -i 's/"datasource": "local"/"datasource": "AKS-core_prod00"/' "dashboards/ecommerce.json"
+                workingDirectory: '$(Build.SourcesDirectory)'

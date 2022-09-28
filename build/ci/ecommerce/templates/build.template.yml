@@ -1,0 +1,15 @@
+parameters:
+- name: revision
+  type: string
+  default: ""
+
+jobs:
+- template: ../../templates/build.template.yml
+  parameters:
+    goVersion: '1.18'
+    imageRepository: 'core/betting/ecommerce'
+    imageRemoteServer: 'sportsbookacr.azurecr.io'
+    dockerfile: './build/packages/ecommerce/Dockerfile'
+    testsPath: './test/sociable/ecommerce'
+    versionFile: 'build/ci/ecommerce/.version'
+    revision: ${{ parameters.revision }}

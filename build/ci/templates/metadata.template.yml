@@ -1,0 +1,48 @@
+parameters:
+- name: versionFile
+  type: string
+- name: revision
+  type: string
+  default: ""
+
+jobs:
+  - job: metadata
+    displayName: Set Metadata
+    steps: 
+    - checkout: self
+      clean: true
+    - task: CmdLine@2
+      displayName: 'Set Artifact Variables'
+      name: artifact
+      inputs:
+        script: |
+            version=$(cat '${{ parameters.versionFile }}')
+            branchName=$(echo $(System.PullRequest.SourceBranch) | rev | cut -d'/' -f 1 | rev)
+            forceArtifact=false
+
+            if git diff --name-only $(Build.SourceVersion)~1 $(Build.SourceVersion) | grep '${{ parameters.versionFile }}' --quiet; then
+                forceArtifact=true
+            fi
+
+            if [ "$(Build.SourceBranch)" == refs/heads/* ]; then
+                branchName=$(echo $(Build.SourceBranch) | rev | cut -d'/' -f 1 | rev)
+            else
+                forceArtifact=true
+            fi
+
+            if [ $forceArtifact ]; then
+                echo "##vso[task.setvariable variable=hasArtifact;isOutput=true;]true"
+                echo "hasArtifact: true"
+            else
+                echo "##vso[task.setvariable variable=hasArtifact;isOutput=true;]false"
+                echo "hasArtifact: false"
+            fi
+
+            if [ "$(Build.SourceBranch)" != "" ] && [ "$(Build.SourceBranch)" != "refs/heads/master" ] && [ "$(Build.SourceBranch)" != "refs/heads/release/*" ]; then
+                version=$(echo $version-$branchName-rc${{ parameters.revision }})
+            else
+                version=$(echo $version)
+            fi
+
+            echo "##vso[task.setvariable variable=version;isOutput=true;]$version"
+            echo "version: $version"

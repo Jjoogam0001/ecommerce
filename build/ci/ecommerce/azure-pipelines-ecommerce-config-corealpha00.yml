@@ -1,0 +1,29 @@
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - deployments/aks/config/corealpha00/*
+
+pool:
+  vmImage: ubuntu-latest
+  
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: Martsoft-Coreecommerce/bet-pipeline-templates
+
+stages:
+  - stage: deployconfig
+    displayName: Deploy ecommerce Config
+    jobs:
+    - template: configmapfromfile/template.yml@templates
+      parameters:
+        environment: 'core-alpha00'
+        kubernetesServiceConnection: 'coreecommerce-to-core-alpha00AKS'
+        deployerEndpoint: 'Core-Dev-to-MartsoftbookACR'
+        configPath: 'deployments/aks/config/corealpha00/config.yaml'
+        configName: 'ecommerce'
+        configMapName: 'ecommerce-ecommerce-config'

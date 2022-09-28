@@ -1,0 +1,14 @@
+{
+    "database": {
+        "connectionString": "host=localhost port=5432 dbname=ecommerce user=postgres password=root"
+    
+    },
+    "httpserver": {
+        "addr": "localhost:3001"
+    },
+    "logLevel": "DEBUG",
+ 
+    "swagger":{
+        "host":"localhost:3001"
+      }
+}

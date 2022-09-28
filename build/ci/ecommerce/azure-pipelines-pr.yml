@@ -1,0 +1,117 @@
+trigger:
+  paths:
+    include:
+    - deployments/aks/manifests/*
+    - build/*
+    - cmd/ecommerce/*
+    - internal/app/conflict/*
+    - internal/pkg/*
+    - vendor/*
+    - go.mod
+    - go.sum
+
+  branches:
+    exclude:
+    - master
+
+pool:
+   vmImage: 'ubuntu-latest'
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: Martsoft-CoreBetting/bet-pipeline-templates
+
+variables:
+  version.revision: $[counter('buildCounter',1)]
+
+stages:
+  - stage: build
+    displayName: Build
+    jobs:
+      - template: templates/build.template.yml
+        parameters:
+          revision: $(version.revision)
+  
+  - stage: setversion
+    displayName: Set Version
+    dependsOn: build
+    variables:
+      version: $[ stageDependencies.build.metadata.outputs['artifact.version'] ]
+    jobs:
+      - job: setversion
+        steps:
+        - checkout: none
+        - task: CmdLine@2
+          inputs:
+            script: |
+              echo "Setting version to: $(version)"
+              echo "##vso[build.updateBuildNumber]$(version)"
+
+  - stage: deploydev
+    displayName: Deploy to Dev
+    dependsOn:
+    - setversion
+    - build
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'Manual'))
+    variables:
+      version: $[ stageDependencies.build.metadata.outputs['artifact.version'] ]
+    jobs:
+      - template: templates/deploy_corealpha00.template.yml
+        parameters:
+          version: $(version)
+
+
+  - stage: deploytest
+    displayName: Deploy to Test
+    dependsOn:
+    - setversion
+    - build
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
+    variables:
+      version: $[ stageDependencies.build.metadata.outputs['artifact.version'] ]
+    jobs:
+      - template: templates/deploy_coretest00.template.yml
+        parameters:
+          version: $(version)
+
+# TODO: Replace with e2e
+  - stage: checkecommerceCoreTest00
+    displayName: Check ecommerce CoreTest00
+    dependsOn:
+    - deploytest
+    condition: succeeded()
+    jobs:
+      - job: CheckHealth
+        displayName: Check Health
+        pool: 'core-test00'
+        container:
+          image: Martsoftbookacr.azurecr.io/core/common/deployer
+          endpoint: Core-Dev-to-MartsoftbookACR
+        steps:
+        - script: CURL_RESPONSE=`curl -s http://core-test.core-test00.azne.mgsops.net/betting/ecommerce/health` && echo "##vso[task.setvariable variable=CURL_RESPONSE;isOutput=true]$CURL_RESPONSE" && echo $CURL_RESPONSE
+          displayName: CURL_RESPONSE
+          name: curlResult
+
+      - job: checkCurlResponse
+        displayName: Check curl response
+        dependsOn: CheckHealth
+        condition: eq(dependencies.CheckHealth.outputs['curlResult.CURL_RESPONSE'], 'OK')
+        steps:
+        - script: echo "Curl response equal "OK" !"
+          displayName: "curl checked OK!"
+
+  - stage: deploylnp
+    displayName: Deploy to LNP
+    dependsOn:
+    - setversion
+    - build
+    - checkecommerceCoreTest00
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
+    variables:
+      version: $[ stageDependencies.build.metadata.outputs['artifact.version'] ]
+    jobs:
+      - template: templates/deploy_corelnp00.template.yml
+        parameters:
+          version: $(version)

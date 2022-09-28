@@ -1,0 +1,76 @@
+parameters:
+- name: goVersion
+  type: string
+- name: imageRepository
+  type: string
+- name: imageRemoteServer
+  type: string
+- name: dockerfile
+  type: string
+- name: testsPath
+  type: string
+- name: versionFile
+  type: string
+- name: revision
+  type: string
+  default: ""
+
+jobs:
+  - template: metadata.template.yml
+    parameters:
+      versionFile: '${{ parameters.versionFile }}'
+      revision: '${{ parameters.revision }}'
+
+  - job: build
+    displayName: Build, Test & Publish Docker Image
+    dependsOn: metadata
+    variables:
+      version: $[ dependencies.metadata.outputs['artifact.version'] ]
+      hasArtifact: $[ dependencies.metadata.outputs['artifact.hasArtifact'] ]
+    steps: 
+    - checkout: self
+      clean: true
+    - task: GoTool@0
+      displayName: "Setup Go"
+      inputs:
+        version: '${{ parameters.goVersion }}'
+
+    - task: CmdLine@2
+      displayName: 'Run Functional Tests'
+      condition: ne('${{ parameters.testsPath }}', '')
+      inputs:
+        script: |
+            export GOBIN=$(System.DefaultWorkingDirectory)/.bin
+            go install gotest.tools/gotestsum@latest
+            $(System.DefaultWorkingDirectory)/.bin/gotestsum --junitfile testreport-functionaltests.xml ${{ parameters.testsPath }} -v
+
+    - task: Docker@2
+      displayName: Build Docker Image
+      inputs:
+        containerRegistry: 'Core-Dev-to-SportsbookACR'
+        repository: ${{ parameters.imageRepository }}
+        command: 'build'
+        Dockerfile: ${{ parameters.dockerfile }}
+        buildContext: '.'
+        tags: $(version)
+        arguments: --build-arg BUILD_VERSION=$(version)
+        addBaseImageData: false
+
+    - task: Docker@2
+      displayName: 'Pushing Docker Image'
+      condition: or(eq(variables['hasArtifact'], 'true'), eq(variables['Build.Reason'], 'Manual'))
+      inputs:
+        containerRegistry: 'Core-Dev-to-SportsbookACR'
+        repository: ${{ parameters.imageRepository }}
+        command: 'push'
+        tags: $(version)
+        addBaseImageData: false
+
+    - task: PublishTestResults@2
+      displayName: 'Publish Functional Test Results'
+      condition: ne('${{ parameters.testsPath }}', '')
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: 'testreport-functionaltests.xml'
+        searchFolder: '$(Build.SourcesDirectory)'
+        testRunTitle: 'Functional Tests'

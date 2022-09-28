@@ -1,0 +1,11 @@
+{
+  "database": {
+    "connectionString": "host=localhost port=5432 dbname=ecommerce user=postgres password=root"
+},
+    "httpserver": {
+        "addr": "0.0.0.0:80",
+        "requestTimeout": 30
+    },
+    
+        "logLevel": "WARN"
+}

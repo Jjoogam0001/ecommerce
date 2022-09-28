@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+
+  prometheus:
+    container_name: ecommerce-prometheus
+    image: prom/prometheus
+    user: root
+    volumes:
+      - "./ddl/prometheus/:/etc/prometheus/"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+      - "--web.enable-lifecycle"
+    ports:
+      - "9090:9090"
+    networks:
+      - local
+
+  grafana:
+    container_name: ecommerce-grafana
+    image: grafana/grafana:7.3.10
+    user: root
+    ports:
+      - "3000:3000"
+    volumes:
+      - "./ddl/grafana/provisioning/:/etc/grafana/provisioning/"
+      - "../dashboards/:/var/lib/grafana/dashboards/"
+    environment:
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - local
+      
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ./ddl/db/schema/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
+    networks:
+      - local
+
+  ecommerce:
+    build:
+      context: ../
+      dockerfile: build/packages/ecommerce/Dockerfile
+      args: 
+        BUILD_VERSION: compose_dev
+    depends_on:
+      - postgres
+    networks:
+      - local
+    ports:
+      - 3001:80
+    env_file:
+      - ../.env
+networks:
+  local:

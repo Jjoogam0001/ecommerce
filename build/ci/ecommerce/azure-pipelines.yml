@@ -1,0 +1,121 @@
+trigger:
+  branches:
+    include:
+    - master
+
+variables:
+  isMaster: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
+
+pool:
+   vmImage: 'ubuntu-latest'
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: Sports-CoreBetting/bet-pipeline-templates
+
+stages:
+  - stage: build
+    displayName: Build Conflicts
+    dependsOn:
+    jobs:
+      - template: templates/build.template.yml
+
+  
+  - stage: deploy_corealpha00
+    displayName: Deploy to Core Alpha00
+    dependsOn:
+      - build
+    condition: and(succeeded(), or(eq(dependencies.build.outputs['metadata.artifact.hasArtifact'], 'true' ), eq(variables['Build.Reason'], 'Manual')))
+    variables:
+      version: $[ stageDependencies.build.metadata.outputs['artifact.version'] ]
+    jobs:
+      - template: templates/deploy_corealpha00.template.yml
+        parameters:
+          version: $(version)
+
+  - stage: deploy_coretest00
+    displayName: Deploy to Core Test00
+    dependsOn:
+      - build
+    condition: and(succeeded(), eq(dependencies.build.outputs['metadata.artifact.hasArtifact'], 'true' ), eq(variables.isMaster, 'true'))
+    variables:
+      version: $[ stageDependencies.build.metadata.outputs['artifact.version'] ]
+    jobs:
+      - template: templates/deploy_coretest00.template.yml
+        parameters:
+          version: $(version)
+
+# TODO: Replace with e2e
+  - stage: checkConflictsCoreTest00
+    displayName: Check Conflicts Core Test00
+    dependsOn:
+      - deploy_coretest00
+    condition: succeeded()
+    jobs:
+      - job: CheckHealth
+        displayName: Check Health
+        pool: 'core-test00'
+        container:
+          image: sportsbookacr.azurecr.io/core/common/deployer
+          endpoint: Core-Dev-to-SportsbookACR
+        steps:
+        - script: CURL_RESPONSE=`curl -s http://core-test.core-test00.azne.mgsops.net/betting/conflicts/health` && echo "##vso[task.setvariable variable=CURL_RESPONSE;isOutput=true]$CURL_RESPONSE" && echo $CURL_RESPONSE
+          displayName: CURL_RESPONSE
+          name: curlResult
+
+      - job: checkCurlResponse
+        displayName: Check curl response
+        dependsOn: CheckHealth
+        condition: eq(dependencies.CheckHealth.outputs['curlResult.CURL_RESPONSE'], 'OK')
+        steps:
+        - script: echo "Curl response equal "OK" !"
+          displayName: "curl checked OK!"
+  
+  - stage: deploy_corelnp00
+    displayName: Deploy to Core Lnp00 
+    dependsOn:
+      - checkConflictsCoreTest00
+      - build
+    condition: and(succeeded(), eq(dependencies.build.outputs['metadata.artifact.hasArtifact'], 'true' ), eq(variables.isMaster, 'true'))
+    variables:
+      version: $[ stageDependencies.build.metadata.outputs['artifact.version'] ]
+    jobs:
+      - template: templates/deploy_corelnp00.template.yml
+        parameters:
+          version: $(version)
+
+# TODO: check lnp tests
+
+  - stage: tagging
+    displayName: Tagging of the version
+    dependsOn:
+      - deploy_corelnp00
+      - build
+    condition: and(succeeded(), eq(dependencies.build.outputs['metadata.artifact.hasArtifact'], 'true' ), eq(variables.isMaster, 'true'))
+    variables:
+      version: $[ stageDependencies.build.metadata.outputs['artifact.version'] ]
+    jobs:
+      - job: tagging
+        steps:
+          - task: CmdLine@2
+            inputs:
+              script: |
+                packageversion=$(echo v$(version))
+                echo "Using package version: $packageversion"
+                git tag $packageversion
+                git push https://$(System.AccessToken)@dev.azure.com/Derivco/Sports-CoreBetting/_git/bet-conflicts $packageversion
+
+  - stage: deploy_coreprod00
+    displayName: Deploy to Core Prod00 
+    dependsOn:
+      - tagging
+      - build
+    condition: and(succeeded(), eq(dependencies.build.outputs['metadata.artifact.hasArtifact'], 'true' ), eq(variables.isMaster, 'true'))
+    variables:
+      version: $[ stageDependencies.build.metadata.outputs['artifact.version'] ]
+    jobs:
+      - template: templates/deploy_coreprod00.template.yml
+        parameters:
+          version: $(version)
