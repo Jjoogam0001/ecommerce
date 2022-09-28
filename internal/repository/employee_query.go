@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"dev.azure.com/jjoogam0290/HelloWorld/HelloWorld/model"
+	"dev.azure.com/jjoogam/Ecommerce-core/model"
 	"emperror.dev/errors"
 	"github.com/jackc/pgx/v4"
 )

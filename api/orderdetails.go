@@ -4,9 +4,9 @@ import (
 	"context"
 	"net/http"
 
-	"dev.azure.com/jjoogam0290/HelloWorld/HelloWorld/api/middleware"
-	"dev.azure.com/jjoogam0290/HelloWorld/HelloWorld/internal/repository"
-	"dev.azure.com/jjoogam0290/HelloWorld/HelloWorld/model"
+	"dev.azure.com/jjoogam/Ecommerce-core/api/middleware"
+	"dev.azure.com/jjoogam/Ecommerce-core/internal/repository"
+	"dev.azure.com/jjoogam/Ecommerce-core/model"
 	"github.com/jackc/pgx/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
