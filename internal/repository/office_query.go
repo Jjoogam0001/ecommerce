@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"dev.azure.com/jjoogam0290/HelloWorld/HelloWorld/model"
+	"dev.azure.com/jjoogam/Ecommerce-core/model"
 	"emperror.dev/errors"
 	"github.com/jackc/pgx/v4"
 )
@@ -43,4 +43,44 @@ func (r *OfficeQueryRepository) GetOffices(ctx context.Context) ([]model.Office,
 	}
 
 	return offices, nil
+}
+
+func (r *OfficeQueryRepository) FindOffice(ctx context.Context, officeCode string) (*model.Office, error) {
+
+	var a model.Office
+	rows, err := r.db.Query(ctx, `SELECT office_code, city, phone, address_line1, address_line2, state, country FROM offices  WHERE office_code=$1`, officeCode)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "error executing query")
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+
+		if err := rows.Scan(
+			&a.OfficeCode, &a.City, &a.Phone, &a.AddressLine, &a.AddressLine2, &a.State, &a.Country,
+		); err != nil {
+			return nil, errors.Wrap(err, "error scanning rows")
+		}
+
+	}
+	if rows.Err() != nil {
+		return nil, errors.Wrap(rows.Err(), "error while reading")
+	}
+	return &a, err
+
+}
+
+func (r *OfficeQueryRepository) DeleteOffice(ctx context.Context, officeCode string) error {
+
+	rows, err := r.db.Query(ctx, `DELETE  FROM offices  WHERE office_code=$1`, officeCode)
+
+	if err != nil {
+		errors.Wrap(err, "error executing query")
+	}
+
+	defer rows.Close()
+	return err
+
 }

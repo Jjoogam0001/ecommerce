@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	"dev.azure.com/jjoogam0290/HelloWorld/HelloWorld/model"
+	"dev.azure.com/jjoogam/Ecommerce-core/model"
 	"github.com/labstack/echo/v4"
 )
 

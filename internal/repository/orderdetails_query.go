@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"dev.azure.com/jjoogam0290/HelloWorld/HelloWorld/model"
+	"dev.azure.com/jjoogam/Ecommerce-core/model"
 	"emperror.dev/errors"
 	"github.com/jackc/pgx/v4"
 )
@@ -43,4 +43,44 @@ func (r *OrderDetailQueryRepository) GetOrderDetails(ctx context.Context) ([]mod
 	}
 
 	return orderDetails, nil
+}
+
+func (r *OrderDetailQueryRepository) FindOrderDetails(ctx context.Context, orderNumber int) ([]model.OrderDetail, error) {
+	orderDetails := []model.OrderDetail{}
+
+	rows, err := r.db.Query(ctx, `SELECT order_number, product_code,quantity_ordered, price_each, order_line_number FROM orderdetails WHERE order_number=$1`, orderNumber)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "error executing query")
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var a model.OrderDetail
+		if err := rows.Scan(
+			&a.OrderNumber, &a.ProductCode, &a.QuantityOrdered, &a.PriceEach, &a.OrderLineNumber,
+		); err != nil {
+			return nil, errors.Wrap(err, "error scanning rows")
+		}
+		orderDetails = append(orderDetails, a)
+	}
+	if rows.Err() != nil {
+		return nil, errors.Wrap(rows.Err(), "error while reading")
+	}
+	return orderDetails, err
+
+}
+func (r *OrderDetailQueryRepository) DeleteOrder(ctx context.Context, orderNumber int) error {
+
+	rows, err := r.db.Query(ctx, `DELETE FROM orderdetails WHERE order_number=$1`, orderNumber)
+
+	if err != nil {
+		return errors.Wrap(err, "error executing query")
+	}
+
+	defer rows.Close()
+
+	return err
+
 }

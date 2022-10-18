@@ -1,17 +1,13 @@
 package api
 
 import (
+	"dev.azure.com/jjoogam/Ecommerce-core/api/docs/swagger"
+	"dev.azure.com/jjoogam/Ecommerce-core/api/middleware"
+	"dev.azure.com/jjoogam/Ecommerce-core/config"
+	"github.com/labstack/echo/v4"
 	"net/http"
 
-	"github.com/labstack/echo/v4"
-
 	echoSwagger "github.com/swaggo/echo-swagger"
-
-	"dev.azure.com/jjoogam0290/HelloWorld/HelloWorld/api/docs/swagger"
-	"dev.azure.com/jjoogam0290/HelloWorld/HelloWorld/api/middleware"
-	"dev.azure.com/jjoogam0290/HelloWorld/HelloWorld/config"
-	_ "dev.azure.com/jjoogam0290/HelloWorld/HelloWorld/docs/swagger"
-	_ "dev.azure.com/jjoogam0290/HelloWorld/HelloWorld/model"
 )
 
 // API defines the functions of the risk HTTP server.

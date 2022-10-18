@@ -5,11 +5,12 @@ import (
 	"net/http"
 	"strconv"
 
-	"dev.azure.com/jjoogam0290/HelloWorld/HelloWorld/api/middleware"
-	"dev.azure.com/jjoogam0290/HelloWorld/HelloWorld/internal/repository"
-	"dev.azure.com/jjoogam0290/HelloWorld/HelloWorld/model"
+	"dev.azure.com/jjoogam/Ecommerce-core/api/middleware"
+	"dev.azure.com/jjoogam/Ecommerce-core/internal/repository"
+	"dev.azure.com/jjoogam/Ecommerce-core/model"
 	"github.com/jackc/pgx/v4"
 	"github.com/labstack/echo/v4"
+
 	"github.com/pkg/errors"
 )
 
@@ -22,6 +23,7 @@ type (
 	CustomerQueryRepository interface {
 		GetCustomers(ctx context.Context) ([]model.Customer, error)
 		FindCustomer(ctx context.Context, customerNumber int) (*model.Customer, error)
+		DeleteCustomer(ctx context.Context, customerNumber int) error
 	}
 
 	CustomerQueryRepositoryFactory func(pgx.Tx) CustomerQueryRepository
@@ -47,6 +49,7 @@ func (a *CustomerController) RegisterRoutes(e *echo.Echo) {
 	customerGroup := e.Group("/customers", middleware.Transaction(a.txProvider))
 	customerGroup.GET("/get_customers", a.Getcustomers)
 	customerGroup.GET("/get_customer", a.findCustomer)
+	customerGroup.DELETE("/delete_customer", a.deleteCustomer)
 
 }
 
@@ -99,6 +102,41 @@ func (a *CustomerController) findCustomer(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, customer)
+
+}
+
+// @Summary Deletes a single customer
+// @Description Deletes a single customer
+// @Tags Customer
+// @Produce json
+// @Router /customers/delete_customer [delete]
+// @Param customer_number query int true "customer_number mandatory"
+// @Success 200 {object} model.Customer
+// @Failure 400 {object} model.ErrValidation
+func (a *CustomerController) deleteCustomer(c echo.Context) error {
+	cuid, err := a.decodeCustomer(c)
+	if err != nil {
+		return errors.Wrap(err, "unable to decode")
+	}
+	db, err := middleware.FromTransactionContext(c)
+	if err != nil {
+		return errors.Wrap(err, "unable to resolve transaction")
+	}
+	r := a.queryRepositoryFactory(db)
+	ctx := c.Request().Context()
+	customer, err := r.FindCustomer(ctx, *cuid)
+	if err != nil {
+		return errors.Wrap(err, "unable to find customer to delete")
+	}
+	err = r.DeleteCustomer(ctx, *cuid)
+	if err != nil {
+		return errors.Wrap(err, "cant delete customer")
+	}
+
+	return c.JSON(http.StatusOK, model.CustomerResponse{
+		Customer: *customer,
+		Status:   "Deleted",
+	})
 
 }
 

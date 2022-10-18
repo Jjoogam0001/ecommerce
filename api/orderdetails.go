@@ -3,10 +3,11 @@ package api
 import (
 	"context"
 	"net/http"
+	"strconv"
 
-	"dev.azure.com/jjoogam0290/HelloWorld/HelloWorld/api/middleware"
-	"dev.azure.com/jjoogam0290/HelloWorld/HelloWorld/internal/repository"
-	"dev.azure.com/jjoogam0290/HelloWorld/HelloWorld/model"
+	"dev.azure.com/jjoogam/Ecommerce-core/api/middleware"
+	"dev.azure.com/jjoogam/Ecommerce-core/internal/repository"
+	"dev.azure.com/jjoogam/Ecommerce-core/model"
 	"github.com/jackc/pgx/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
@@ -20,6 +21,8 @@ type (
 
 	OrderDetailQueryRepository interface {
 		GetOrderDetails(ctx context.Context) ([]model.OrderDetail, error)
+		FindOrderDetails(ctx context.Context, orderNumber int) ([]model.OrderDetail, error)
+		DeleteOrder(ctx context.Context, orderNumber int) error
 	}
 
 	OrderDetailQueryRepositoryFactory func(pgx.Tx) OrderDetailQueryRepository
@@ -44,6 +47,8 @@ func (a *OrderDetailController) WithQueryRepository(f OrderDetailQueryRepository
 func (a *OrderDetailController) RegisterRoutes(e *echo.Echo) {
 	orderDetailGroup := e.Group("/orderDetails", middleware.Transaction(a.txProvider))
 	orderDetailGroup.GET("/get_orderDetails", a.GetOrderDetails)
+	orderDetailGroup.GET("/get_orderDetail", a.findOrderDetails)
+	orderDetailGroup.DELETE("/delete_orderDetail", a.deleteOrderDetails)
 
 }
 
@@ -69,4 +74,82 @@ func (a *OrderDetailController) GetOrderDetails(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, orders)
+}
+
+// @Summary Retrieve order details
+// @Description Fetch order details
+// @Tags Orders
+// @Produce json
+// @Router /orderDetails/get_orderDetail [get]
+// @Param order_number query int true "order_number mandatory"
+// @Success 200 {object} model.Order
+// @Failure 400 {object} model.ErrValidation
+func (a *OrderDetailController) findOrderDetails(c echo.Context) error {
+	cuid, err := a.decodeOrderDetails(c)
+	if err != nil {
+		return errors.Wrap(err, "unable to decode")
+	}
+	db, err := middleware.FromTransactionContext(c)
+	if err != nil {
+		return errors.Wrap(err, "unable to resolve transaction")
+	}
+	r := a.queryRepositoryFactory(db)
+	ctx := c.Request().Context()
+	customer, err := r.FindOrderDetails(ctx, *cuid)
+	if err != nil {
+		return errors.Wrap(err, "cant find employee")
+	}
+
+	return c.JSON(http.StatusOK, customer)
+
+}
+
+// @Summary Delete order details
+// @Description Delete order details
+// @Tags Orders
+// @Produce json
+// @Router /orderDetails/delete_orderDetail [delete]
+// @Param order_number query int true "order_number mandatory"
+// @Success 200 {object} model.Order
+// @Failure 400 {object} model.ErrValidation
+func (a *OrderDetailController) deleteOrderDetails(c echo.Context) error {
+	cuid, err := a.decodeOrderDetails(c)
+	if err != nil {
+		return errors.Wrap(err, "unable to decode")
+	}
+	db, err := middleware.FromTransactionContext(c)
+	if err != nil {
+		return errors.Wrap(err, "unable to resolve transaction")
+	}
+	r := a.queryRepositoryFactory(db)
+	ctx := c.Request().Context()
+	customer, err := r.FindOrderDetails(ctx, *cuid)
+	if err != nil {
+		return errors.Wrap(err, "cant find order")
+	}
+
+	err = r.DeleteOrder(ctx, *cuid)
+	if err != nil {
+		return errors.Wrap(err, "cant delete order")
+	}
+
+	return c.JSON(http.StatusOK, model.OrderDetailResponse{
+		OrderDetail: customer[1],
+		Status:      "Deleted",
+	})
+
+}
+
+func (h *OrderDetailController) decodeOrderDetails(c echo.Context) (*int, error) {
+	customerNumber := c.QueryParam("order_number")
+	if customerNumber == "" && len(customerNumber) == 0 {
+		return nil, model.ErrValidation{InvalidParams: []model.InvalidParam{{Name: "order_number", Reason: "Missing key customer_number ."}}}
+	}
+
+	cuId, err := strconv.Atoi(customerNumber)
+	if err != nil {
+		return nil, model.ErrValidation{InvalidParams: []model.InvalidParam{{Name: "order_number", Reason: "Incorrect customer_number"}}}
+	}
+
+	return &cuId, nil
 }

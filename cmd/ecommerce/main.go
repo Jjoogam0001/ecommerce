@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
+	"dev.azure.com/jjoogam/Ecommerce-core/config"
+	"log"
 
-	"dev.azure.com/jjoogam0290/HelloWorld/HelloWorld/api"
-	"dev.azure.com/jjoogam0290/HelloWorld/HelloWorld/config"
-	"github.com/labstack/gommon/log"
+	"dev.azure.com/jjoogam/Ecommerce-core/api"
 )
 
 func main() {
@@ -24,7 +24,7 @@ func main() {
 	defer pool.Close()
 
 	if err != nil {
-		log.Error(err)
+		log.Fatal(err)
 	}
 
 	if err := api.NewAPI(c).UsingDefaultControllers(pool).Start(c.HTTPServer.Addr); err != nil {

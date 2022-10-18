@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"dev.azure.com/jjoogam0290/HelloWorld/HelloWorld/model"
+	"dev.azure.com/jjoogam/Ecommerce-core/model"
 	"emperror.dev/errors"
 	"github.com/jackc/pgx/v4"
 )
@@ -72,5 +72,19 @@ func (r *CustomerQueryRepository) FindCustomer(ctx context.Context, customerNumb
 		return nil, errors.Wrap(rows.Err(), "error while reading")
 	}
 	return &a, err
+
+}
+
+func (r *CustomerQueryRepository) DeleteCustomer(ctx context.Context, customerNumber int) error {
+
+	rows, err := r.db.Query(ctx, `DELETE FROM customers WHERE customer_number=$1`, customerNumber)
+
+	if err != nil {
+		return errors.Wrap(err, "error executing query")
+	}
+
+	defer rows.Close()
+
+	return err
 
 }
