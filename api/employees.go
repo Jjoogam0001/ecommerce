@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"net/http"
+	"strconv"
 
 	"dev.azure.com/jjoogam/Ecommerce-core/api/middleware"
 	"dev.azure.com/jjoogam/Ecommerce-core/internal/repository"
@@ -20,6 +21,8 @@ type (
 
 	EmployeeQueryRepository interface {
 		GetEmployees(ctx context.Context) ([]model.Employee, error)
+		FindEmployee(ctx context.Context, employeeNumber int) (*model.Employee, error)
+		DeleteEmployee(ctx context.Context, employeeNumber int) error
 	}
 
 	EmployeeQueryRepositoryFactory func(pgx.Tx) EmployeeQueryRepository
@@ -44,6 +47,8 @@ func (a *EmployeeController) WithQueryRepository(f EmployeeQueryRepositoryFactor
 func (a *EmployeeController) RegisterRoutes(e *echo.Echo) {
 	employeeGroup := e.Group("/employees", middleware.Transaction(a.txProvider))
 	employeeGroup.GET("/get_employees", a.GetEmployees)
+	employeeGroup.GET("/get_employee", a.findemployee)
+	employeeGroup.DELETE("/delete_employee", a.deleteEmployee)
 
 }
 
@@ -69,4 +74,81 @@ func (a *EmployeeController) GetEmployees(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, orders)
+}
+
+// @Summary Retrieve a single Employee
+// @Description Fetch a single Employee
+// @Tags Employees
+// @Produce json
+// @Router /employees/get_employee [get]
+// @Param employee_number query int true "employee_number mandatory"
+// @Success 200 {object} model.Employee
+// @Failure 400 {object} model.ErrValidation
+func (a *EmployeeController) findemployee(c echo.Context) error {
+	cuid, err := a.decodeEmployee(c)
+	if err != nil {
+		return errors.Wrap(err, "unable to decode")
+	}
+	db, err := middleware.FromTransactionContext(c)
+	if err != nil {
+		return errors.Wrap(err, "unable to resolve transaction")
+	}
+	r := a.queryRepositoryFactory(db)
+	ctx := c.Request().Context()
+	customer, err := r.FindEmployee(ctx, *cuid)
+	if err != nil {
+		return errors.Wrap(err, "cant find employee")
+	}
+
+	return c.JSON(http.StatusOK, customer)
+
+}
+
+// @Summary deletes a single Employee
+// @Description deleted a single Employee
+// @Tags Employees
+// @Produce json
+// @Router /employees/delete_employee [delete]
+// @Param employee_number query int true "employee_number mandatory"
+// @Success 200 {object} model.Employee
+// @Failure 400 {object} model.ErrValidation
+func (a *EmployeeController) deleteEmployee(c echo.Context) error {
+	cuid, err := a.decodeEmployee(c)
+	if err != nil {
+		return errors.Wrap(err, "unable to decode")
+	}
+	db, err := middleware.FromTransactionContext(c)
+	if err != nil {
+		return errors.Wrap(err, "unable to resolve transaction")
+	}
+	r := a.queryRepositoryFactory(db)
+	ctx := c.Request().Context()
+	customer, err := r.FindEmployee(ctx, *cuid)
+	if err != nil {
+		return errors.Wrap(err, "cant find employee")
+	}
+	err = r.DeleteEmployee(ctx, *cuid)
+	if err != nil {
+		return errors.Wrap(err, "cant delete employee")
+	}
+
+	return c.JSON(http.StatusOK, model.EmployeeResponse{
+		Employee: *customer,
+		Status:   "Delete",
+	})
+
+}
+
+func (h *EmployeeController) decodeEmployee(c echo.Context) (*int, error) {
+	customerNumber := c.QueryParam("employee_number")
+	if customerNumber == "" && len(customerNumber) == 0 {
+		return nil, model.ErrValidation{InvalidParams: []model.InvalidParam{{Name: "employee_number", Reason: "Missing key customer_number ."}}}
+	}
+
+	cuId, err := strconv.Atoi(customerNumber)
+	if err != nil {
+		return nil, model.ErrValidation{InvalidParams: []model.InvalidParam{{Name: "employee_number", Reason: "Incorrect customer_number"}}}
+	}
+
+	return &cuId, nil
 }

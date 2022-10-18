@@ -20,6 +20,8 @@ type (
 
 	OfficeQueryRepository interface {
 		GetOffices(ctx context.Context) ([]model.Office, error)
+		FindOffice(ctx context.Context, officeCode string) (*model.Office, error)
+		DeleteOffice(ctx context.Context, officeCode string) error
 	}
 
 	OfficeQueryRepositoryFactory func(pgx.Tx) OfficeQueryRepository
@@ -44,6 +46,8 @@ func (a *OfficeController) WithQueryRepository(f OfficeQueryRepositoryFactory) *
 func (a *OfficeController) RegisterRoutes(e *echo.Echo) {
 	officeGroup := e.Group("/offices", middleware.Transaction(a.txProvider))
 	officeGroup.GET("/get_offices", a.GetOffices)
+	officeGroup.GET("/get_office", a.findOffice)
+	officeGroup.DELETE("/delete_office", a.deleteOffice)
 
 }
 
@@ -69,4 +73,75 @@ func (a *OfficeController) GetOffices(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, orders)
+}
+
+// @Summary Retrieve a single Office
+// @Description Fetch a single Office
+// @Tags Offices
+// @Produce json
+// @Router /offices/get_office [get]
+// @Param office_code query string true "office_code mandatory"
+// @Success 200 {object} model.Office
+// @Failure 400 {object} model.ErrValidation
+func (a *OfficeController) findOffice(c echo.Context) error {
+	cuid, err := a.decodeOffice(c)
+	if err != nil {
+		return errors.Wrap(err, "unable to decode")
+	}
+	db, err := middleware.FromTransactionContext(c)
+	if err != nil {
+		return errors.Wrap(err, "unable to resolve transaction")
+	}
+	r := a.queryRepositoryFactory(db)
+	ctx := c.Request().Context()
+	customer, err := r.FindOffice(ctx, *cuid)
+	if err != nil {
+		return errors.Wrap(err, "cant find employee")
+	}
+
+	return c.JSON(http.StatusOK, customer)
+
+}
+
+// @Summary Deletes a single Office
+// @Description Deletes a single Office
+// @Tags Offices
+// @Produce json
+// @Router /offices/delete_office [delete]
+// @Param office_code query string true "office_code mandatory"
+// @Success 200 {object} model.Office
+// @Failure 400 {object} model.ErrValidation
+func (a *OfficeController) deleteOffice(c echo.Context) error {
+	cuid, err := a.decodeOffice(c)
+	if err != nil {
+		return errors.Wrap(err, "unable to decode")
+	}
+	db, err := middleware.FromTransactionContext(c)
+	if err != nil {
+		return errors.Wrap(err, "unable to resolve transaction")
+	}
+	r := a.queryRepositoryFactory(db)
+	ctx := c.Request().Context()
+	customer, err := r.FindOffice(ctx, *cuid)
+
+	if err != nil {
+		return errors.Wrap(err, "cant find employee")
+	}
+
+	err = r.DeleteOffice(ctx, *cuid)
+	if err != nil {
+		return errors.Wrap(err, "cant delete employee")
+	}
+
+	return c.JSON(http.StatusOK, customer)
+
+}
+
+func (h *OfficeController) decodeOffice(c echo.Context) (*string, error) {
+	customerNumber := c.QueryParam("office_code")
+	if customerNumber == "" && len(customerNumber) == 0 {
+		return nil, model.ErrValidation{InvalidParams: []model.InvalidParam{{Name: "office_code", Reason: "Missing key office_code ."}}}
+	}
+
+	return &customerNumber, nil
 }

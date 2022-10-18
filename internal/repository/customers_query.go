@@ -74,3 +74,17 @@ func (r *CustomerQueryRepository) FindCustomer(ctx context.Context, customerNumb
 	return &a, err
 
 }
+
+func (r *CustomerQueryRepository) DeleteCustomer(ctx context.Context, customerNumber int) error {
+
+	rows, err := r.db.Query(ctx, `DELETE FROM customers WHERE customer_number=$1`, customerNumber)
+
+	if err != nil {
+		return errors.Wrap(err, "error executing query")
+	}
+
+	defer rows.Close()
+
+	return err
+
+}

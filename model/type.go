@@ -82,4 +82,33 @@ type (
 		HtmlDescription string `json:"html_description"`
 		Image           []byte `json:"image"`
 	}
+
+	CustomerResponse struct {
+		Customer Customer `json:"customer"`
+		Status   string   `json:"status"`
+	}
+	ProductResponse struct {
+		Product Product `json:"product"`
+		Status  string  `json:"status"`
+	}
+	OrderDetailResponse struct {
+		OrderDetail OrderDetail `json:"orderdetail"`
+		Status      string      `json:"status"`
+	}
+	OfficeResponse struct {
+		Office Office `json:"office"`
+		Status string `json:"status"`
+	}
+	EmployeeResponse struct {
+		Employee Employee `json:"employee"`
+		Status   string   `json:"status"`
+	}
+	OrderResponse struct {
+		Order  Order  `json:"order"`
+		Status string `json:"status"`
+	}
+	PaymentResponse struct {
+		Payment Payment `json:"payment"`
+		Status  string  `json:"status"`
+	}
 )

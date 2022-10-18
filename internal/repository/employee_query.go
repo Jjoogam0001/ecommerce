@@ -45,3 +45,42 @@ func (r *EmployeeQueryRepository) GetEmployees(ctx context.Context) ([]model.Emp
 
 	return employees, nil
 }
+func (r *EmployeeQueryRepository) FindEmployee(ctx context.Context, employeeNumber int) (*model.Employee, error) {
+
+	var a model.Employee
+	rows, err := r.db.Query(ctx, `SELECT employee_number,first_name,last_name,extension,email,office_code, COALESCE(reports_to,0), job_title FROM employees  WHERE employee_number=$1`, employeeNumber)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "error executing query")
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+
+		if err := rows.Scan(
+			&a.EmployeeNumber, &a.FirstName, &a.LastName, &a.Extension, &a.Email, &a.OfficeCode, &a.ReportsTo, &a.Job_Title,
+		); err != nil {
+			return nil, errors.Wrap(err, "error scanning rows")
+		}
+
+	}
+	if rows.Err() != nil {
+		return nil, errors.Wrap(rows.Err(), "error while reading")
+	}
+	return &a, err
+
+}
+func (r *EmployeeQueryRepository) DeleteEmployee(ctx context.Context, employeeNumber int) error {
+
+	rows, err := r.db.Query(ctx, `DELETE FROM employees  WHERE employee_number=$1`, employeeNumber)
+
+	if err != nil {
+		return errors.Wrap(err, "error executing query")
+	}
+
+	defer rows.Close()
+
+	return err
+
+}
