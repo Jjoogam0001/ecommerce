@@ -111,14 +111,14 @@ func (c HostConfig) ReadAppConfig() (AppConfig, error) {
 	configFile := "config.json"
 	config := path.Join(dirPath, configFile)
 	if err := a.loadJSON(config); err != nil {
-		return a, errors.Errorf("cannot parse default config file from path %s for env %s in folder (and parents) %s", config, env, cwd)
+		return a, fmt.Errorf("cannot parse default config file from path %s for env %s in folder (and parents) %s", config, env, cwd)
 	}
 
 	if env != "" {
 		configFile = "config." + env + ".json"
 		config := path.Join(dirPath, configFile)
 		if err := a.loadJSON(config); err != nil {
-			return a, errors.Errorf("cannot parse config file from path %s for env %s in folder (and parents) %s", config, env, cwd)
+			return a, fmt.Errorf("cannot parse config file from path %s for env %s in folder (and parents) %s", config, env, cwd)
 		}
 	}
 
@@ -165,7 +165,7 @@ func (c AppConfig) StartDatabase(ctx context.Context) (*pgxpool.Pool, error) {
 
 	db, err := sql.Open("pgx", c.Database.ConnectionString)
 	if err != nil {
-		return nil, errors.Errorf("error connecting", err)
+		return nil, fmt.Errorf("error connecting", err)
 	}
 	defer db.Close()
 

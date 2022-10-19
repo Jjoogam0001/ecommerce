@@ -2,9 +2,9 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"dev.azure.com/jjoogam/Ecommerce-core/model"
-	"emperror.dev/errors"
 	"github.com/jackc/pgx/v4"
 )
 
@@ -24,7 +24,7 @@ func (r *ProductLineQueryRepository) GetProductLines(ctx context.Context) ([]mod
 	query := `SELECT  product_line, text_description , image FROM product_lines;`
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
-		return nil, errors.Errorf("error executing query", err)
+		return nil, fmt.Errorf("error executing query", err)
 	}
 
 	defer rows.Close()
@@ -34,13 +34,13 @@ func (r *ProductLineQueryRepository) GetProductLines(ctx context.Context) ([]mod
 		if err := rows.Scan(
 			&a.ProductLine, &a.TextDescription, &a.Image,
 		); err != nil {
-			return nil, errors.Errorf("error scanning rows", err)
+			return nil, fmt.Errorf("error scanning rows", err)
 		}
 		productLines = append(productLines, a)
 	}
 
 	if rows.Err() != nil {
-		return nil, errors.Errorf("error while reading", rows.Err())
+		return nil, fmt.Errorf("error while reading", rows.Err())
 	}
 
 	return productLines, nil

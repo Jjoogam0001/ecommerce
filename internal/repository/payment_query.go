@@ -2,9 +2,9 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"dev.azure.com/jjoogam/Ecommerce-core/model"
-	"emperror.dev/errors"
 	"github.com/jackc/pgx/v4"
 )
 
@@ -23,7 +23,7 @@ func (r *PaymentQueryRepository) GetPayments(ctx context.Context) ([]model.Payme
 	query := ` SELECT  customer_number, check_number, payment_date, amount FROM payments; `
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
-		return nil, errors.Errorf("error executing query", err)
+		return nil, fmt.Errorf("error executing query", err)
 	}
 
 	defer rows.Close()
@@ -33,13 +33,13 @@ func (r *PaymentQueryRepository) GetPayments(ctx context.Context) ([]model.Payme
 		if err := rows.Scan(
 			&a.CustomerNumber, &a.CheckNumber, &a.PaymentDate, &a.Amount,
 		); err != nil {
-			return nil, errors.Errorf("error scanning rows", err)
+			return nil, fmt.Errorf("error scanning rows", err)
 		}
 		payments = append(payments, a)
 	}
 
 	if rows.Err() != nil {
-		return nil, errors.Errorf("error while reading", rows.Err())
+		return nil, fmt.Errorf("error while reading", rows.Err())
 	}
 
 	return payments, nil
@@ -51,7 +51,7 @@ func (r *PaymentQueryRepository) FindPayment(ctx context.Context, customerNumber
 	rows, err := r.db.Query(ctx, `SELECT  customer_number, check_number, payment_date, amount FROM payments WHERE customer_number=$1`, customerNumber)
 
 	if err != nil {
-		return nil, errors.Errorf("error executing query", err)
+		return nil, fmt.Errorf("error executing query", err)
 	}
 
 	defer rows.Close()
@@ -61,13 +61,13 @@ func (r *PaymentQueryRepository) FindPayment(ctx context.Context, customerNumber
 		if err := rows.Scan(
 			&a.CustomerNumber, &a.CheckNumber, &a.PaymentDate, &a.Amount,
 		); err != nil {
-			return nil, errors.Errorf("error scanning rows", err)
+			return nil, fmt.Errorf("error scanning rows", err)
 		}
 
 		pymts = append(pymts, a)
 	}
 	if rows.Err() != nil {
-		return nil, errors.Errorf("error while reading", rows.Err())
+		return nil, fmt.Errorf("error while reading", rows.Err())
 	}
 	return pymts, err
 
@@ -77,7 +77,7 @@ func (r *PaymentQueryRepository) DeletePayment(ctx context.Context, customerNumb
 	rows, err := r.db.Query(ctx, `DELETE FROM payments WHERE customer_number=$1`, customerNumber)
 
 	if err != nil {
-		return errors.Errorf("error executing query", err)
+		return fmt.Errorf("error executing query", err)
 	}
 
 	defer rows.Close()

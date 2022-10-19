@@ -8,7 +8,6 @@ import (
 	"dev.azure.com/jjoogam/Ecommerce-core/api/middleware"
 	"dev.azure.com/jjoogam/Ecommerce-core/internal/repository"
 	"dev.azure.com/jjoogam/Ecommerce-core/model"
-	"emperror.dev/errors"
 	"github.com/jackc/pgx/v4"
 	"github.com/labstack/echo/v4"
 )
@@ -63,14 +62,14 @@ func (a *OrderDetailController) GetOrderDetails(c echo.Context) error {
 
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Errorf("unable to resolve transaction", err)
+		return err
 	}
 	r := a.queryRepositoryFactory(db)
 
 	ctx := c.Request().Context()
 	orders, err := r.GetOrderDetails(ctx)
 	if err != nil {
-		return errors.Errorf("unable to resolve transaction", err)
+		return err
 	}
 
 	return c.JSON(http.StatusOK, orders)
@@ -87,17 +86,17 @@ func (a *OrderDetailController) GetOrderDetails(c echo.Context) error {
 func (a *OrderDetailController) findOrderDetails(c echo.Context) error {
 	cuid, err := a.decodeOrderDetails(c)
 	if err != nil {
-		return errors.Errorf("unable to decode", err)
+		return err
 	}
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Errorf("unable to resolve transaction", err)
+		return err
 	}
 	r := a.queryRepositoryFactory(db)
 	ctx := c.Request().Context()
 	customer, err := r.FindOrderDetails(ctx, *cuid)
 	if err != nil {
-		return errors.Errorf("cant find employee", err)
+		return err
 	}
 
 	return c.JSON(http.StatusOK, customer)
@@ -115,22 +114,22 @@ func (a *OrderDetailController) findOrderDetails(c echo.Context) error {
 func (a *OrderDetailController) deleteOrderDetails(c echo.Context) error {
 	cuid, err := a.decodeOrderDetails(c)
 	if err != nil {
-		return errors.Errorf("unable to decode", err)
+		return err
 	}
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Errorf("unable to resolve transaction", err)
+		return err
 	}
 	r := a.queryRepositoryFactory(db)
 	ctx := c.Request().Context()
 	customer, err := r.FindOrderDetails(ctx, *cuid)
 	if err != nil {
-		return errors.Errorf("cant find order", err)
+		return err
 	}
 
 	err = r.DeleteOrder(ctx, *cuid)
 	if err != nil {
-		return errors.Errorf("cant delete order", err)
+		return err
 	}
 
 	return c.JSON(http.StatusOK, model.OrderDetailResponse{

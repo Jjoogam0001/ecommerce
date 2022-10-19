@@ -10,7 +10,6 @@ import (
 	"dev.azure.com/jjoogam/Ecommerce-core/model"
 	"github.com/jackc/pgx/v4"
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 )
 
 type (
@@ -63,14 +62,14 @@ func (a *EmployeeController) GetEmployees(c echo.Context) error {
 
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Errorf("unable to resolve transaction", err)
+		return err
 	}
 	r := a.queryRepositoryFactory(db)
 
 	ctx := c.Request().Context()
 	orders, err := r.GetEmployees(ctx)
 	if err != nil {
-		return errors.Errorf("unable to resolve transaction", err)
+		return err
 	}
 
 	return c.JSON(http.StatusOK, orders)
@@ -87,17 +86,17 @@ func (a *EmployeeController) GetEmployees(c echo.Context) error {
 func (a *EmployeeController) findemployee(c echo.Context) error {
 	cuid, err := a.decodeEmployee(c)
 	if err != nil {
-		return errors.Errorf("unable to decode", err)
+		return err
 	}
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Errorf("unable to resolve transaction", err)
+		return err
 	}
 	r := a.queryRepositoryFactory(db)
 	ctx := c.Request().Context()
 	customer, err := r.FindEmployee(ctx, *cuid)
 	if err != nil {
-		return errors.Errorf("cant find employee", err)
+		return err
 	}
 
 	return c.JSON(http.StatusOK, customer)
@@ -115,21 +114,21 @@ func (a *EmployeeController) findemployee(c echo.Context) error {
 func (a *EmployeeController) deleteEmployee(c echo.Context) error {
 	cuid, err := a.decodeEmployee(c)
 	if err != nil {
-		return errors.Errorf("unable to decode", err)
+		return err
 	}
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Errorf("unable to resolve transaction", err)
+		return err
 	}
 	r := a.queryRepositoryFactory(db)
 	ctx := c.Request().Context()
 	customer, err := r.FindEmployee(ctx, *cuid)
 	if err != nil {
-		return errors.Errorf("cant find employee", err)
+		return err
 	}
 	err = r.DeleteEmployee(ctx, *cuid)
 	if err != nil {
-		return errors.Errorf("cant delete employee", err)
+		return err
 	}
 
 	return c.JSON(http.StatusOK, model.EmployeeResponse{

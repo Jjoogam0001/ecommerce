@@ -7,7 +7,6 @@ import (
 	"dev.azure.com/jjoogam/Ecommerce-core/api/middleware"
 	"dev.azure.com/jjoogam/Ecommerce-core/internal/repository"
 	"dev.azure.com/jjoogam/Ecommerce-core/model"
-	"emperror.dev/errors"
 	"github.com/jackc/pgx/v4"
 	"github.com/labstack/echo/v4"
 )
@@ -62,14 +61,14 @@ func (a *ProductController) getorders(c echo.Context) error {
 
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Errorf("unable to resolve transaction", err)
+		return err
 	}
 	r := a.queryRepositoryFactory(db)
 
 	ctx := c.Request().Context()
 	orders, err := r.GetProducts(ctx)
 	if err != nil {
-		return errors.Errorf("unable to resolve transaction", err)
+		return err
 	}
 
 	return c.JSON(http.StatusOK, orders)
@@ -86,17 +85,17 @@ func (a *ProductController) getorders(c echo.Context) error {
 func (a *ProductController) findProduct(c echo.Context) error {
 	cuid, err := a.decodeProduct(c)
 	if err != nil {
-		return errors.Errorf("unable to decode", err)
+		return err
 	}
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Errorf("unable to resolve transaction", err)
+		return err
 	}
 	r := a.queryRepositoryFactory(db)
 	ctx := c.Request().Context()
 	customer, err := r.FindProduct(ctx, *cuid)
 	if err != nil {
-		return errors.Errorf("cant find product", err)
+		return err
 	}
 
 	return c.JSON(http.StatusOK, customer)
@@ -114,22 +113,22 @@ func (a *ProductController) findProduct(c echo.Context) error {
 func (a *ProductController) deleteProduct(c echo.Context) error {
 	cuid, err := a.decodeProduct(c)
 	if err != nil {
-		return errors.Errorf("unable to decode", err)
+		return err
 	}
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Errorf("unable to resolve transaction", err)
+		return err
 	}
 	r := a.queryRepositoryFactory(db)
 	ctx := c.Request().Context()
 	customer, err := r.FindProduct(ctx, *cuid)
 	if err != nil {
-		return errors.Errorf("cant find product", err)
+		return err
 	}
 	err = r.DeleteProduct(ctx, *cuid)
 
 	if err != nil {
-		return errors.Errorf("cant delete product", err)
+		return err
 	}
 	return c.JSON(http.StatusOK, model.ProductResponse{
 		Product: *customer,

@@ -7,7 +7,6 @@ import (
 	"dev.azure.com/jjoogam/Ecommerce-core/api/middleware"
 	"dev.azure.com/jjoogam/Ecommerce-core/internal/repository"
 	"dev.azure.com/jjoogam/Ecommerce-core/model"
-	"emperror.dev/errors"
 	"github.com/jackc/pgx/v4"
 	"github.com/labstack/echo/v4"
 )
@@ -62,14 +61,14 @@ func (a *OfficeController) GetOffices(c echo.Context) error {
 
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Errorf("unable to resolve transaction", err)
+		return err
 	}
 	r := a.queryRepositoryFactory(db)
 
 	ctx := c.Request().Context()
 	orders, err := r.GetOffices(ctx)
 	if err != nil {
-		return errors.Errorf("unable to resolve transaction", err)
+		return err
 	}
 
 	return c.JSON(http.StatusOK, orders)
@@ -86,17 +85,17 @@ func (a *OfficeController) GetOffices(c echo.Context) error {
 func (a *OfficeController) findOffice(c echo.Context) error {
 	cuid, err := a.decodeOffice(c)
 	if err != nil {
-		return errors.Errorf("unable to decode", err)
+		return err
 	}
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Errorf("unable to resolve transaction", err)
+		return err
 	}
 	r := a.queryRepositoryFactory(db)
 	ctx := c.Request().Context()
 	customer, err := r.FindOffice(ctx, *cuid)
 	if err != nil {
-		return errors.Errorf("cant find employee", err)
+		return err
 	}
 
 	return c.JSON(http.StatusOK, customer)
@@ -114,23 +113,23 @@ func (a *OfficeController) findOffice(c echo.Context) error {
 func (a *OfficeController) deleteOffice(c echo.Context) error {
 	cuid, err := a.decodeOffice(c)
 	if err != nil {
-		return errors.Errorf("unable to decode", err)
+		return err
 	}
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Errorf("unable to resolve transaction", err)
+		return err
 	}
 	r := a.queryRepositoryFactory(db)
 	ctx := c.Request().Context()
 	customer, err := r.FindOffice(ctx, *cuid)
 
 	if err != nil {
-		return errors.Errorf("cant find employee", err)
+		return err
 	}
 
 	err = r.DeleteOffice(ctx, *cuid)
 	if err != nil {
-		return errors.Errorf("cant delete employee", err)
+		return err
 	}
 
 	return c.JSON(http.StatusOK, customer)

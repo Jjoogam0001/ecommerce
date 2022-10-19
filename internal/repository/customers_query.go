@@ -2,9 +2,9 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"dev.azure.com/jjoogam/Ecommerce-core/model"
-	"emperror.dev/errors"
 	"github.com/jackc/pgx/v4"
 )
 
@@ -25,7 +25,7 @@ func (r *CustomerQueryRepository) GetCustomers(ctx context.Context) ([]model.Cus
 	credit_limit FROM customers;`
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
-		return nil, errors.Errorf("error executing query", err)
+		return nil, fmt.Errorf("error executing query", err)
 	}
 
 	defer rows.Close()
@@ -35,13 +35,13 @@ func (r *CustomerQueryRepository) GetCustomers(ctx context.Context) ([]model.Cus
 		if err := rows.Scan(
 			&a.CustomerNumber, &a.CustomerName, &a.ContactLastName, &a.ContactFirstName, &a.Phone, &a.AddressLine, &a.AddressLine2, &a.City, &a.State, &a.Country, &a.SalesRepEmpNumber, &a.CreditLimit,
 		); err != nil {
-			return nil, errors.Errorf("error scanning rows", err)
+			return nil, fmt.Errorf("error scanning rows", err)
 		}
 		customers = append(customers, a)
 	}
 
 	if rows.Err() != nil {
-		return nil, errors.Errorf("error while reading", err)
+		return nil, fmt.Errorf("error while reading", err)
 	}
 
 	return customers, nil
@@ -54,7 +54,7 @@ func (r *CustomerQueryRepository) FindCustomer(ctx context.Context, customerNumb
 	credit_limit FROM customers WHERE customer_number=$1`, customerNumber)
 
 	if err != nil {
-		return nil, errors.Errorf("error executing query", err)
+		return nil, fmt.Errorf("error executing query", err)
 	}
 
 	defer rows.Close()
@@ -64,12 +64,12 @@ func (r *CustomerQueryRepository) FindCustomer(ctx context.Context, customerNumb
 		if err := rows.Scan(
 			&a.CustomerNumber, &a.CustomerName, &a.ContactLastName, &a.ContactFirstName, &a.Phone, &a.AddressLine, &a.AddressLine2, &a.City, &a.State, &a.Country, &a.SalesRepEmpNumber, &a.CreditLimit,
 		); err != nil {
-			return nil, errors.Errorf("error scanning rows", err)
+			return nil, fmt.Errorf("error scanning rows", err)
 		}
 
 	}
 	if rows.Err() != nil {
-		return nil, errors.Errorf("error while reading", err)
+		return nil, fmt.Errorf("error while reading", err)
 	}
 	return &a, err
 
@@ -80,7 +80,7 @@ func (r *CustomerQueryRepository) DeleteCustomer(ctx context.Context, customerNu
 	rows, err := r.db.Query(ctx, `DELETE FROM customers WHERE customer_number=$1`, customerNumber)
 
 	if err != nil {
-		return errors.Errorf("error executing query", err)
+		return fmt.Errorf("error executing query", err)
 	}
 
 	defer rows.Close()

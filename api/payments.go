@@ -8,7 +8,6 @@ import (
 	"dev.azure.com/jjoogam/Ecommerce-core/api/middleware"
 	"dev.azure.com/jjoogam/Ecommerce-core/internal/repository"
 	"dev.azure.com/jjoogam/Ecommerce-core/model"
-	"emperror.dev/errors"
 	"github.com/jackc/pgx/v4"
 	"github.com/labstack/echo/v4"
 )
@@ -63,14 +62,14 @@ func (a *PaymentController) GetPayments(c echo.Context) error {
 
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Errorf("unable to resolve transaction", err)
+		return err
 	}
 	r := a.queryRepositoryFactory(db)
 
 	ctx := c.Request().Context()
 	orders, err := r.GetPayments(ctx)
 	if err != nil {
-		return errors.Errorf("unable to resolve transaction", err)
+		return err
 	}
 
 	return c.JSON(http.StatusOK, orders)
@@ -87,17 +86,17 @@ func (a *PaymentController) GetPayments(c echo.Context) error {
 func (a *PaymentController) findPayment(c echo.Context) error {
 	cuid, err := a.decodePayment(c)
 	if err != nil {
-		return errors.Errorf("unable to decode", err)
+		return err
 	}
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Errorf("unable to resolve transaction", err)
+		return err
 	}
 	r := a.queryRepositoryFactory(db)
 	ctx := c.Request().Context()
 	customer, err := r.FindPayment(ctx, *cuid)
 	if err != nil {
-		return errors.Errorf("cant find Payment", err)
+		return err
 	}
 
 	return c.JSON(http.StatusOK, customer)
@@ -115,21 +114,21 @@ func (a *PaymentController) findPayment(c echo.Context) error {
 func (a *PaymentController) deletePayment(c echo.Context) error {
 	cuid, err := a.decodePayment(c)
 	if err != nil {
-		return errors.Errorf("unable to decode", err)
+		return err
 	}
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Errorf("unable to resolve transaction", err)
+		return err
 	}
 	r := a.queryRepositoryFactory(db)
 	ctx := c.Request().Context()
 	customer, err := r.FindPayment(ctx, *cuid)
 	if err != nil {
-		return errors.Errorf("cant find Payment", err)
+		return err
 	}
 	err = r.DeletePayment(ctx, *cuid)
 	if err != nil {
-		return errors.Errorf("cant delete Payment", err)
+		return err
 	}
 	return c.JSON(http.StatusOK, model.PaymentResponse{
 		Payment: customer[1],
