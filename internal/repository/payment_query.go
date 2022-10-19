@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 
 	"dev.azure.com/jjoogam/Ecommerce-core/model"
 	"github.com/jackc/pgx/v4"
@@ -39,7 +38,7 @@ func (r *PaymentQueryRepository) GetPayments(ctx context.Context) ([]model.Payme
 	}
 
 	if rows.Err() != nil {
-		return nil, fmt.Errorf("error while reading", rows.Err())
+		return nil, rows.Err()
 	}
 
 	return payments, nil
@@ -67,7 +66,7 @@ func (r *PaymentQueryRepository) FindPayment(ctx context.Context, customerNumber
 		pymts = append(pymts, a)
 	}
 	if rows.Err() != nil {
-		return nil, fmt.Errorf("error while reading", rows.Err())
+		return nil, rows.Err()
 	}
 	return pymts, err
 
@@ -77,7 +76,7 @@ func (r *PaymentQueryRepository) DeletePayment(ctx context.Context, customerNumb
 	rows, err := r.db.Query(ctx, `DELETE FROM payments WHERE customer_number=$1`, customerNumber)
 
 	if err != nil {
-		returnerr
+		return err
 	}
 
 	defer rows.Close()

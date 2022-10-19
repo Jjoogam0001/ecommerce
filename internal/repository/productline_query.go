@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 
 	"dev.azure.com/jjoogam/Ecommerce-core/model"
 	"github.com/jackc/pgx/v4"
@@ -34,13 +33,13 @@ func (r *ProductLineQueryRepository) GetProductLines(ctx context.Context) ([]mod
 		if err := rows.Scan(
 			&a.ProductLine, &a.TextDescription, &a.Image,
 		); err != nil {
-			return nil, fmt.Errorf("error scanning rows", err)
+			return nil, err
 		}
 		productLines = append(productLines, a)
 	}
 
 	if rows.Err() != nil {
-		return nil, fmt.Errorf("error while reading", rows.Err())
+		return nil, rows.Err()
 	}
 
 	return productLines, nil

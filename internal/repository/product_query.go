@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 
 	"dev.azure.com/jjoogam/Ecommerce-core/model"
 	"github.com/jackc/pgx/v4"
@@ -40,7 +39,7 @@ func (r *ProductQueryRepository) GetProducts(ctx context.Context) ([]model.Produ
 	}
 
 	if rows.Err() != nil {
-		return nil, fmt.Errorf("error while reading", rows.Err())
+		return nil, rows.Err()
 	}
 
 	return products, nil
@@ -66,7 +65,7 @@ func (r *ProductQueryRepository) FindProduct(ctx context.Context, productCode st
 
 	}
 	if rows.Err() != nil {
-		return nil, fmt.Errorf("error while reading", rows.Err())
+		return nil, rows.Err()
 	}
 	return &a, err
 
@@ -77,7 +76,7 @@ func (r *ProductQueryRepository) DeleteProduct(ctx context.Context, productCode 
 	rows, err := r.db.Query(ctx, `DELETE FROM products WHERE product_code=$1`, productCode)
 
 	if err != nil {
-		returnerr
+		return err
 	}
 
 	defer rows.Close()
