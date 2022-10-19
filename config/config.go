@@ -7,7 +7,8 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
+
 	"os"
 	"path"
 	"path/filepath"
@@ -85,7 +86,7 @@ func (c HostConfig) OverridingEnv(env string) HostConfig {
 
 func loadFlags(flags func(*flag.FlagSet)) {
 	set := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
-	set.SetOutput(ioutil.Discard)
+	set.SetOutput(io.Discard)
 	flags(set)
 
 	err := set.Parse(os.Args[1:])
@@ -144,7 +145,7 @@ func (c *AppConfig) loadJSON(filePath string) error {
 		return fmt.Errorf("Error opening file %v: %w", filePath, err)
 	}
 
-	byteValue, _ := ioutil.ReadAll(file)
+	byteValue, _ := io.ReadAll(file)
 
 	if err = file.Close(); err != nil {
 		return fmt.Errorf("Error closing file %v: %w", filePath, err)
