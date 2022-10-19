@@ -38,7 +38,7 @@ definitions:
         type: string
       first_name:
         type: string
-      job_Title:
+      job_title:
         type: string
       last_name:
         type: string
@@ -120,7 +120,7 @@ definitions:
         type: string
       customer_number:
         type: integer
-      rpayment_date:
+      payment_date:
         $ref: '#/definitions/pgtype.Date'
     type: object
   model.Product:
@@ -174,6 +174,52 @@ info:
   title: Martsoft Inc E-Commerce API 2.0
   version: "1.0"
 paths:
+  /customers/delete_customer:
+    delete:
+      description: Deletes a single customer
+      parameters:
+      - description: customer_number mandatory
+        in: query
+        name: customer_number
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Customer'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrValidation'
+      summary: Deletes a single customer
+      tags:
+      - Customer
+  /customers/get_customer:
+    get:
+      description: Fetch a single customer
+      parameters:
+      - description: customer_number mandatory
+        in: query
+        name: customer_number
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Customer'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrValidation'
+      summary: Retrieve a single customer
+      tags:
+      - Customer
   /customers/get_customers:
     get:
       description: Gets all customers
@@ -191,6 +237,52 @@ paths:
       summary: Retrieve all customers
       tags:
       - Customer
+  /employees/delete_employee:
+    delete:
+      description: deleted a single Employee
+      parameters:
+      - description: employee_number mandatory
+        in: query
+        name: employee_number
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Employee'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrValidation'
+      summary: deletes a single Employee
+      tags:
+      - Employees
+  /employees/get_employee:
+    get:
+      description: Fetch a single Employee
+      parameters:
+      - description: employee_number mandatory
+        in: query
+        name: employee_number
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Employee'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrValidation'
+      summary: Retrieve a single Employee
+      tags:
+      - Employees
   /employees/get_employees:
     get:
       description: Gets all Employees
@@ -208,6 +300,52 @@ paths:
       summary: Retrieve all Employees
       tags:
       - Employees
+  /offices/delete_office:
+    delete:
+      description: Deletes a single Office
+      parameters:
+      - description: office_code mandatory
+        in: query
+        name: office_code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Office'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrValidation'
+      summary: Deletes a single Office
+      tags:
+      - Offices
+  /offices/get_office:
+    get:
+      description: Fetch a single Office
+      parameters:
+      - description: office_code mandatory
+        in: query
+        name: office_code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Office'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrValidation'
+      summary: Retrieve a single Office
+      tags:
+      - Offices
   /offices/get_offices:
     get:
       description: Gets all Offices
@@ -225,6 +363,52 @@ paths:
       summary: Retrieve all Offices
       tags:
       - Offices
+  /orderDetails/delete_orderDetail:
+    delete:
+      description: Delete order details
+      parameters:
+      - description: order_number mandatory
+        in: query
+        name: order_number
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Order'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrValidation'
+      summary: Delete order details
+      tags:
+      - Orders
+  /orderDetails/get_orderDetail:
+    get:
+      description: Fetch order details
+      parameters:
+      - description: order_number mandatory
+        in: query
+        name: order_number
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.OrderDetail'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrValidation'
+      summary: Retrieve order details
+      tags:
+      - Orders
   /orderDetails/get_orderDetails:
     get:
       produces:
@@ -239,6 +423,8 @@ paths:
           schema:
             $ref: '#/definitions/model.ErrValidation'
       summary: Retrieve all OrderDetails
+      tags:
+      - OrderDetails
   /orders/get_orders:
     get:
       produces:
@@ -253,6 +439,54 @@ paths:
           schema:
             $ref: '#/definitions/model.ErrValidation'
       summary: Retrieve all Orders
+      tags:
+      - Orders
+  /payments/delete_payment:
+    delete:
+      description: deletes a Payment
+      parameters:
+      - description: customer_number mandatory
+        in: query
+        name: customer_number
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Payment'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrValidation'
+      summary: deletes a  Payment
+      tags:
+      - Payments
+  /payments/get_payment:
+    get:
+      description: Fetch a Payment
+      parameters:
+      - description: customer_number mandatory
+        in: query
+        name: customer_number
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Payment'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrValidation'
+      summary: Retrieve a  Payment
+      tags:
+      - Payments
   /payments/get_payments:
     get:
       produces:
@@ -267,6 +501,8 @@ paths:
           schema:
             $ref: '#/definitions/model.ErrValidation'
       summary: Retrieve all Payments
+      tags:
+      - Payments
   /productLines/get_productLines:
     get:
       produces:
@@ -281,6 +517,54 @@ paths:
           schema:
             $ref: '#/definitions/model.ErrValidation'
       summary: Retrieve all ProductLines
+      tags:
+      - ProductLines
+  /products/delete_product:
+    delete:
+      description: Deletes a single Product
+      parameters:
+      - description: product_code mandatory
+        in: query
+        name: product_code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Product'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrValidation'
+      summary: Deletes a single Product
+      tags:
+      - Products
+  /products/get_product:
+    get:
+      description: Fetch a single Product
+      parameters:
+      - description: product_code mandatory
+        in: query
+        name: product_code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Product'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrValidation'
+      summary: Retrieve a single Product
+      tags:
+      - Products
   /products/get_products:
     get:
       produces:
@@ -295,6 +579,8 @@ paths:
           schema:
             $ref: '#/definitions/model.ErrValidation'
       summary: Retrieve all Payments
+      tags:
+      - Products
 schemes:
 - http
 swagger: "2.0"

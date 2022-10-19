@@ -19,6 +19,76 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/customers/delete_customer": {
+            "delete": {
+                "description": "Deletes a single customer",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Customer"
+                ],
+                "summary": "Deletes a single customer",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "customer_number mandatory",
+                        "name": "customer_number",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Customer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrValidation"
+                        }
+                    }
+                }
+            }
+        },
+        "/customers/get_customer": {
+            "get": {
+                "description": "Fetch a single customer",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Customer"
+                ],
+                "summary": "Retrieve a single customer",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "customer_number mandatory",
+                        "name": "customer_number",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Customer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrValidation"
+                        }
+                    }
+                }
+            }
+        },
         "/customers/get_customers": {
             "get": {
                 "description": "Gets all customers",
@@ -34,6 +104,76 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/model.Customer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrValidation"
+                        }
+                    }
+                }
+            }
+        },
+        "/employees/delete_employee": {
+            "delete": {
+                "description": "deleted a single Employee",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "deletes a single Employee",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "employee_number mandatory",
+                        "name": "employee_number",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Employee"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrValidation"
+                        }
+                    }
+                }
+            }
+        },
+        "/employees/get_employee": {
+            "get": {
+                "description": "Fetch a single Employee",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Retrieve a single Employee",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "employee_number mandatory",
+                        "name": "employee_number",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Employee"
                         }
                     },
                     "400": {
@@ -71,6 +211,76 @@ const docTemplate = `{
                 }
             }
         },
+        "/offices/delete_office": {
+            "delete": {
+                "description": "Deletes a single Office",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Offices"
+                ],
+                "summary": "Deletes a single Office",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "office_code mandatory",
+                        "name": "office_code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Office"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrValidation"
+                        }
+                    }
+                }
+            }
+        },
+        "/offices/get_office": {
+            "get": {
+                "description": "Fetch a single Office",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Offices"
+                ],
+                "summary": "Retrieve a single Office",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "office_code mandatory",
+                        "name": "office_code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Office"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrValidation"
+                        }
+                    }
+                }
+            }
+        },
         "/offices/get_offices": {
             "get": {
                 "description": "Gets all Offices",
@@ -97,10 +307,83 @@ const docTemplate = `{
                 }
             }
         },
+        "/orderDetails/delete_orderDetail": {
+            "delete": {
+                "description": "Delete order details",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Delete order details",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "order_number mandatory",
+                        "name": "order_number",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Order"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrValidation"
+                        }
+                    }
+                }
+            }
+        },
+        "/orderDetails/get_orderDetail": {
+            "get": {
+                "description": "Fetch order details",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Retrieve order details",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "order_number mandatory",
+                        "name": "order_number",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.OrderDetail"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrValidation"
+                        }
+                    }
+                }
+            }
+        },
         "/orderDetails/get_orderDetails": {
             "get": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "OrderDetails"
                 ],
                 "summary": "Retrieve all OrderDetails",
                 "responses": {
@@ -124,6 +407,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Orders"
+                ],
                 "summary": "Retrieve all Orders",
                 "responses": {
                     "200": {
@@ -141,10 +427,83 @@ const docTemplate = `{
                 }
             }
         },
+        "/payments/delete_payment": {
+            "delete": {
+                "description": "deletes a Payment",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "deletes a  Payment",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "customer_number mandatory",
+                        "name": "customer_number",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Payment"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrValidation"
+                        }
+                    }
+                }
+            }
+        },
+        "/payments/get_payment": {
+            "get": {
+                "description": "Fetch a Payment",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Retrieve a  Payment",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "customer_number mandatory",
+                        "name": "customer_number",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Payment"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrValidation"
+                        }
+                    }
+                }
+            }
+        },
         "/payments/get_payments": {
             "get": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Payments"
                 ],
                 "summary": "Retrieve all Payments",
                 "responses": {
@@ -168,6 +527,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "ProductLines"
+                ],
                 "summary": "Retrieve all ProductLines",
                 "responses": {
                     "200": {
@@ -185,10 +547,83 @@ const docTemplate = `{
                 }
             }
         },
+        "/products/delete_product": {
+            "delete": {
+                "description": "Deletes a single Product",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Deletes a single Product",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "product_code mandatory",
+                        "name": "product_code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Product"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrValidation"
+                        }
+                    }
+                }
+            }
+        },
+        "/products/get_product": {
+            "get": {
+                "description": "Fetch a single Product",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Retrieve a single Product",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "product_code mandatory",
+                        "name": "product_code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Product"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrValidation"
+                        }
+                    }
+                }
+            }
+        },
         "/products/get_products": {
             "get": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Products"
                 ],
                 "summary": "Retrieve all Payments",
                 "responses": {
@@ -268,7 +703,7 @@ const docTemplate = `{
                 "first_name": {
                     "type": "string"
                 },
-                "job_Title": {
+                "job_title": {
                     "type": "string"
                 },
                 "last_name": {
@@ -394,7 +829,7 @@ const docTemplate = `{
                 "customer_number": {
                     "type": "integer"
                 },
-                "rpayment_date": {
+                "payment_date": {
                     "$ref": "#/definitions/pgtype.Date"
                 }
             }

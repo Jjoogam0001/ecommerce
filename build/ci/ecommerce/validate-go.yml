@@ -1,0 +1,33 @@
+jobs:
+  - job: build    
+    displayName: 'Build Go application'  
+    pool:
+      vmImage: 'ubuntu-latest'
+
+    steps:  
+    - task: GoTool@0
+      displayName: 'Use Go 1.19'
+      inputs:
+        version: '1.19'
+    
+    - script: |
+        export GOPRIVATE=dev.azure.com
+        echo "${GOPRIVATE}"
+        ls -l
+        make -f Makefile build-ecommerce
+
+      displayName: Build application
+
+    - script: |
+        make -f Makefile test-sociable-api
+      displayName: 'Run tests'
+
+    - script: |
+        make -f Makefile run-local
+      displayName: 'Run App'
+
+    - script: |        
+        curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $HOME/go/bin v1.32.2        
+        $HOME/go/bin/golangci-lint run
+      displayName: 'Run linter'
+      

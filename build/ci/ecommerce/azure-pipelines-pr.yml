@@ -1,52 +1,16 @@
+# Run pipeline when master or develop is changed
 trigger:
-  paths:
-    include:
-    - deployments/aks/manifests/*
-    - build/*
-    - cmd/ecommerce/*
-    - internal/app/conflict/*
-    - internal/pkg/*
-    - vendor/*
-    - go.mod
-    - go.sum
+  - master
+  - develop
 
+# Run pipeline whenever a PR is raised
+pr:
   branches:
-    exclude:
-    - master
-
-pool:
-   vmImage: 'ubuntu-latest'
-
-resources:
-  repositories:
-    - repository: templates
-      type: git
-      name: Martsoft-CoreBetting/bet-pipeline-templates
-
-variables:
-  version.revision: $[counter('buildCounter',1)]
+    include:
+      - 'refs/heads/master'
 
 stages:
-  - stage: build
-    displayName: Build
+  - stage: validate
+    displayName: 'Validate and Test Go application'
     jobs:
-      - template: templates/build.template.yml
-        parameters:
-          revision: $(version.revision)
-  
-  - stage: setversion
-    displayName: Set Version
-    dependsOn: build
-    variables:
-      version: $[ stageDependencies.build.metadata.outputs['artifact.version'] ]
-    jobs:
-      - job: setversion
-        steps:
-        - checkout: none
-        - task: CmdLine@2
-          inputs:
-            script: |
-              echo "Setting version to: $(version)"
-              echo "##vso[build.updateBuildNumber]$(version)"
-
-
+    - template: validate-go.yml

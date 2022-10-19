@@ -82,7 +82,7 @@ func (a *OrderDetailController) GetOrderDetails(c echo.Context) error {
 // @Produce json
 // @Router /orderDetails/get_orderDetail [get]
 // @Param order_number query int true "order_number mandatory"
-// @Success 200 {object} model.Order
+// @Success 200 {object} model.OrderDetail
 // @Failure 400 {object} model.ErrValidation
 func (a *OrderDetailController) findOrderDetails(c echo.Context) error {
 	cuid, err := a.decodeOrderDetails(c)
