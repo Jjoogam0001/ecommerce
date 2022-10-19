@@ -63,14 +63,14 @@ func (a *EmployeeController) GetEmployees(c echo.Context) error {
 
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Wrap(err, "unable to resolve transaction")
+		return errors.Errorf("unable to resolve transaction", err)
 	}
 	r := a.queryRepositoryFactory(db)
 
 	ctx := c.Request().Context()
 	orders, err := r.GetEmployees(ctx)
 	if err != nil {
-		return errors.Wrap(err, "unable to resolve transaction")
+		return errors.Errorf("unable to resolve transaction", err)
 	}
 
 	return c.JSON(http.StatusOK, orders)
@@ -87,17 +87,17 @@ func (a *EmployeeController) GetEmployees(c echo.Context) error {
 func (a *EmployeeController) findemployee(c echo.Context) error {
 	cuid, err := a.decodeEmployee(c)
 	if err != nil {
-		return errors.Wrap(err, "unable to decode")
+		return errors.Errorf("unable to decode", err)
 	}
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Wrap(err, "unable to resolve transaction")
+		return errors.Errorf("unable to resolve transaction", err)
 	}
 	r := a.queryRepositoryFactory(db)
 	ctx := c.Request().Context()
 	customer, err := r.FindEmployee(ctx, *cuid)
 	if err != nil {
-		return errors.Wrap(err, "cant find employee")
+		return errors.Errorf("cant find employee", err)
 	}
 
 	return c.JSON(http.StatusOK, customer)
@@ -115,21 +115,21 @@ func (a *EmployeeController) findemployee(c echo.Context) error {
 func (a *EmployeeController) deleteEmployee(c echo.Context) error {
 	cuid, err := a.decodeEmployee(c)
 	if err != nil {
-		return errors.Wrap(err, "unable to decode")
+		return errors.Errorf("unable to decode", err)
 	}
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Wrap(err, "unable to resolve transaction")
+		return errors.Errorf("unable to resolve transaction", err)
 	}
 	r := a.queryRepositoryFactory(db)
 	ctx := c.Request().Context()
 	customer, err := r.FindEmployee(ctx, *cuid)
 	if err != nil {
-		return errors.Wrap(err, "cant find employee")
+		return errors.Errorf("cant find employee", err)
 	}
 	err = r.DeleteEmployee(ctx, *cuid)
 	if err != nil {
-		return errors.Wrap(err, "cant delete employee")
+		return errors.Errorf("cant delete employee", err)
 	}
 
 	return c.JSON(http.StatusOK, model.EmployeeResponse{

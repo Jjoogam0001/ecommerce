@@ -8,9 +8,9 @@ import (
 	"dev.azure.com/jjoogam/Ecommerce-core/api/middleware"
 	"dev.azure.com/jjoogam/Ecommerce-core/internal/repository"
 	"dev.azure.com/jjoogam/Ecommerce-core/model"
+	"emperror.dev/errors"
 	"github.com/jackc/pgx/v4"
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 )
 
 type (
@@ -63,14 +63,14 @@ func (a *PaymentController) GetPayments(c echo.Context) error {
 
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Wrap(err, "unable to resolve transaction")
+		return errors.Errorf("unable to resolve transaction", err)
 	}
 	r := a.queryRepositoryFactory(db)
 
 	ctx := c.Request().Context()
 	orders, err := r.GetPayments(ctx)
 	if err != nil {
-		return errors.Wrap(err, "unable to resolve transaction")
+		return errors.Errorf("unable to resolve transaction", err)
 	}
 
 	return c.JSON(http.StatusOK, orders)
@@ -87,17 +87,17 @@ func (a *PaymentController) GetPayments(c echo.Context) error {
 func (a *PaymentController) findPayment(c echo.Context) error {
 	cuid, err := a.decodePayment(c)
 	if err != nil {
-		return errors.Wrap(err, "unable to decode")
+		return errors.Errorf("unable to decode", err)
 	}
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Wrap(err, "unable to resolve transaction")
+		return errors.Errorf("unable to resolve transaction", err)
 	}
 	r := a.queryRepositoryFactory(db)
 	ctx := c.Request().Context()
 	customer, err := r.FindPayment(ctx, *cuid)
 	if err != nil {
-		return errors.Wrap(err, "cant find Payment")
+		return errors.Errorf("cant find Payment", err)
 	}
 
 	return c.JSON(http.StatusOK, customer)
@@ -115,21 +115,21 @@ func (a *PaymentController) findPayment(c echo.Context) error {
 func (a *PaymentController) deletePayment(c echo.Context) error {
 	cuid, err := a.decodePayment(c)
 	if err != nil {
-		return errors.Wrap(err, "unable to decode")
+		return errors.Errorf("unable to decode", err)
 	}
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Wrap(err, "unable to resolve transaction")
+		return errors.Errorf("unable to resolve transaction", err)
 	}
 	r := a.queryRepositoryFactory(db)
 	ctx := c.Request().Context()
 	customer, err := r.FindPayment(ctx, *cuid)
 	if err != nil {
-		return errors.Wrap(err, "cant find Payment")
+		return errors.Errorf("cant find Payment", err)
 	}
 	err = r.DeletePayment(ctx, *cuid)
 	if err != nil {
-		return errors.Wrap(err, "cant delete Payment")
+		return errors.Errorf("cant delete Payment", err)
 	}
 	return c.JSON(http.StatusOK, model.PaymentResponse{
 		Payment: customer[1],

@@ -8,9 +8,9 @@ import (
 	"dev.azure.com/jjoogam/Ecommerce-core/api/middleware"
 	"dev.azure.com/jjoogam/Ecommerce-core/internal/repository"
 	"dev.azure.com/jjoogam/Ecommerce-core/model"
+	"emperror.dev/errors"
 	"github.com/jackc/pgx/v4"
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 )
 
 type (
@@ -63,14 +63,14 @@ func (a *OrderDetailController) GetOrderDetails(c echo.Context) error {
 
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Wrap(err, "unable to resolve transaction")
+		return errors.Errorf("unable to resolve transaction", err)
 	}
 	r := a.queryRepositoryFactory(db)
 
 	ctx := c.Request().Context()
 	orders, err := r.GetOrderDetails(ctx)
 	if err != nil {
-		return errors.Wrap(err, "unable to resolve transaction")
+		return errors.Errorf("unable to resolve transaction", err)
 	}
 
 	return c.JSON(http.StatusOK, orders)
@@ -87,17 +87,17 @@ func (a *OrderDetailController) GetOrderDetails(c echo.Context) error {
 func (a *OrderDetailController) findOrderDetails(c echo.Context) error {
 	cuid, err := a.decodeOrderDetails(c)
 	if err != nil {
-		return errors.Wrap(err, "unable to decode")
+		return errors.Errorf("unable to decode", err)
 	}
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Wrap(err, "unable to resolve transaction")
+		return errors.Errorf("unable to resolve transaction", err)
 	}
 	r := a.queryRepositoryFactory(db)
 	ctx := c.Request().Context()
 	customer, err := r.FindOrderDetails(ctx, *cuid)
 	if err != nil {
-		return errors.Wrap(err, "cant find employee")
+		return errors.Errorf("cant find employee", err)
 	}
 
 	return c.JSON(http.StatusOK, customer)
@@ -115,22 +115,22 @@ func (a *OrderDetailController) findOrderDetails(c echo.Context) error {
 func (a *OrderDetailController) deleteOrderDetails(c echo.Context) error {
 	cuid, err := a.decodeOrderDetails(c)
 	if err != nil {
-		return errors.Wrap(err, "unable to decode")
+		return errors.Errorf("unable to decode", err)
 	}
 	db, err := middleware.FromTransactionContext(c)
 	if err != nil {
-		return errors.Wrap(err, "unable to resolve transaction")
+		return errors.Errorf("unable to resolve transaction", err)
 	}
 	r := a.queryRepositoryFactory(db)
 	ctx := c.Request().Context()
 	customer, err := r.FindOrderDetails(ctx, *cuid)
 	if err != nil {
-		return errors.Wrap(err, "cant find order")
+		return errors.Errorf("cant find order", err)
 	}
 
 	err = r.DeleteOrder(ctx, *cuid)
 	if err != nil {
-		return errors.Wrap(err, "cant delete order")
+		return errors.Errorf("cant delete order", err)
 	}
 
 	return c.JSON(http.StatusOK, model.OrderDetailResponse{

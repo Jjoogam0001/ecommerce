@@ -3,7 +3,7 @@ package middleware
 import (
 	"context"
 
-	"github.com/pkg/errors"
+	"emperror.dev/errors"
 
 	"github.com/jackc/pgx/v4"
 	"github.com/labstack/echo/v4"

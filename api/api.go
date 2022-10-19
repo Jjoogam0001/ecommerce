@@ -1,11 +1,12 @@
 package api
 
 import (
+	"net/http"
+
 	"dev.azure.com/jjoogam/Ecommerce-core/api/docs/swagger"
 	"dev.azure.com/jjoogam/Ecommerce-core/api/middleware"
 	"dev.azure.com/jjoogam/Ecommerce-core/config"
 	"github.com/labstack/echo/v4"
-	"net/http"
 
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
@@ -33,7 +34,7 @@ func NewAPI(c config.AppConfig) *API {
 	e := echo.New()
 
 	middleware.UseLogger(e)
-	e.GET("/swagger/*", echoSwagger.WrapHandler)
+	e.GET("/swagger/*", echoSwagger.EchoWrapHandler())
 	e.GET("/healthcheck", health)
 	initSwagerInfo(c)
 	return &API{server: e}

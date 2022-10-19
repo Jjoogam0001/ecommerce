@@ -23,7 +23,7 @@ func (r *OrderDetailQueryRepository) GetOrderDetails(ctx context.Context) ([]mod
 	query := ` SELECT order_number, product_code,quantity_ordered, price_each, order_line_number FROM orderdetails; `
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
-		return nil, errors.Wrap(err, "error executing query")
+		return nil, errors.Errorf("error executing query", err)
 	}
 
 	defer rows.Close()
@@ -33,13 +33,13 @@ func (r *OrderDetailQueryRepository) GetOrderDetails(ctx context.Context) ([]mod
 		if err := rows.Scan(
 			&a.OrderNumber, &a.ProductCode, &a.QuantityOrdered, &a.PriceEach, &a.OrderLineNumber,
 		); err != nil {
-			return nil, errors.Wrap(err, "error scanning rows")
+			return nil, errors.Errorf("error scanning rows", err)
 		}
 		orderDetails = append(orderDetails, a)
 	}
 
 	if rows.Err() != nil {
-		return nil, errors.Wrap(rows.Err(), "error while reading")
+		return nil, errors.Errorf("error while reading", rows.Err())
 	}
 
 	return orderDetails, nil
@@ -51,7 +51,7 @@ func (r *OrderDetailQueryRepository) FindOrderDetails(ctx context.Context, order
 	rows, err := r.db.Query(ctx, `SELECT order_number, product_code,quantity_ordered, price_each, order_line_number FROM orderdetails WHERE order_number=$1`, orderNumber)
 
 	if err != nil {
-		return nil, errors.Wrap(err, "error executing query")
+		return nil, errors.Errorf("error executing query", err)
 	}
 
 	defer rows.Close()
@@ -61,12 +61,12 @@ func (r *OrderDetailQueryRepository) FindOrderDetails(ctx context.Context, order
 		if err := rows.Scan(
 			&a.OrderNumber, &a.ProductCode, &a.QuantityOrdered, &a.PriceEach, &a.OrderLineNumber,
 		); err != nil {
-			return nil, errors.Wrap(err, "error scanning rows")
+			return nil, errors.Errorf("error scanning rows", err)
 		}
 		orderDetails = append(orderDetails, a)
 	}
 	if rows.Err() != nil {
-		return nil, errors.Wrap(rows.Err(), "error while reading")
+		return nil, errors.Errorf("error while reading", rows.Err())
 	}
 	return orderDetails, err
 
@@ -76,7 +76,7 @@ func (r *OrderDetailQueryRepository) DeleteOrder(ctx context.Context, orderNumbe
 	rows, err := r.db.Query(ctx, `DELETE FROM orderdetails WHERE order_number=$1`, orderNumber)
 
 	if err != nil {
-		return errors.Wrap(err, "error executing query")
+		return errors.Errorf("error executing query", err)
 	}
 
 	defer rows.Close()

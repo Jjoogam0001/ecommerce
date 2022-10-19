@@ -13,10 +13,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"emperror.dev/errors"
 	"github.com/jackc/pgx/v4/pgxpool"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/labstack/gommon/log"
-	"github.com/pkg/errors"
 )
 
 // AppConfig contains the application configuration.
@@ -110,14 +110,14 @@ func (c HostConfig) ReadAppConfig() (AppConfig, error) {
 	configFile := "config.json"
 	config := path.Join(dirPath, configFile)
 	if err := a.loadJSON(config); err != nil {
-		return a, errors.Wrapf(err, "cannot parse default config file from path %s for env %s in folder (and parents) %s", config, env, cwd)
+		return a, errors.Errorf("cannot parse default config file from path %s for env %s in folder (and parents) %s", config, env, cwd)
 	}
 
 	if env != "" {
 		configFile = "config." + env + ".json"
 		config := path.Join(dirPath, configFile)
 		if err := a.loadJSON(config); err != nil {
-			return a, errors.Wrapf(err, "cannot parse config file from path %s for env %s in folder (and parents) %s", config, env, cwd)
+			return a, errors.Errorf("cannot parse config file from path %s for env %s in folder (and parents) %s", config, env, cwd)
 		}
 	}
 
@@ -164,15 +164,11 @@ func (c AppConfig) StartDatabase(ctx context.Context) (*pgxpool.Pool, error) {
 
 	db, err := sql.Open("pgx", c.Database.ConnectionString)
 	if err != nil {
-		return nil, errors.Wrap(err, "error connecting")
+		return nil, errors.Errorf("error connecting", err)
 	}
 	defer db.Close()
 
 	return pgxpool.Connect(ctx, c.Database.ConnectionString)
-}
-
-func emptySnapshotUp(tx *sql.Tx) error {
-	return nil
 }
 
 func findPath(target string, dir string) (string, error) {

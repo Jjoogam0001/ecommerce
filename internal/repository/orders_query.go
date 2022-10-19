@@ -23,7 +23,7 @@ func (r *OrderQueryRepository) Getorders(ctx context.Context) ([]model.Order, er
 	query := ` SELECT order_number,order_date,required_date,shipped_date,status,customer_number,comments from orders where comments is not NULL; `
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
-		return nil, errors.Wrap(err, "error executing query")
+		return nil, errors.Errorf("error executing query", err)
 	}
 
 	defer rows.Close()
@@ -33,13 +33,13 @@ func (r *OrderQueryRepository) Getorders(ctx context.Context) ([]model.Order, er
 		if err := rows.Scan(
 			&a.OrderNumber, &a.OrderDate, &a.RequiredDate, &a.ShippedDate, &a.Status, &a.Customer_number, &a.Comments,
 		); err != nil {
-			return nil, errors.Wrap(err, "error scanning rows")
+			return nil, errors.Errorf("error scanning rows", err)
 		}
 		orders = append(orders, a)
 	}
 
 	if rows.Err() != nil {
-		return nil, errors.Wrap(rows.Err(), "error while reading")
+		return nil, errors.Errorf("error while reading", rows.Err())
 	}
 
 	return orders, nil

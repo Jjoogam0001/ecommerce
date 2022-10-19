@@ -24,7 +24,7 @@ func (r *ProductLineQueryRepository) GetProductLines(ctx context.Context) ([]mod
 	query := `SELECT  product_line, text_description , image FROM product_lines;`
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
-		return nil, errors.Wrap(err, "error executing query")
+		return nil, errors.Errorf("error executing query", err)
 	}
 
 	defer rows.Close()
@@ -34,13 +34,13 @@ func (r *ProductLineQueryRepository) GetProductLines(ctx context.Context) ([]mod
 		if err := rows.Scan(
 			&a.ProductLine, &a.TextDescription, &a.Image,
 		); err != nil {
-			return nil, errors.Wrap(err, "error scanning rows")
+			return nil, errors.Errorf("error scanning rows", err)
 		}
 		productLines = append(productLines, a)
 	}
 
 	if rows.Err() != nil {
-		return nil, errors.Wrap(rows.Err(), "error while reading")
+		return nil, errors.Errorf("error while reading", rows.Err())
 	}
 
 	return productLines, nil
