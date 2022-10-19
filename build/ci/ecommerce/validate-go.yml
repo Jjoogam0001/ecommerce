@@ -22,10 +22,6 @@ jobs:
         make -f Makefile test-sociable-api
       displayName: 'Run tests'
 
-    - script: |
-        make -f Makefile run-local
-      displayName: 'Run App'
-
     - script: |        
         curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $HOME/go/bin v1.32.2        
         $HOME/go/bin/golangci-lint run
