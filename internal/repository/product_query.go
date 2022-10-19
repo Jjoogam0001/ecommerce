@@ -24,7 +24,7 @@ func (r *ProductQueryRepository) GetProducts(ctx context.Context) ([]model.Produ
 	query := `SELECT  product_code, product_name, product_line,product_scale, product_vendor, product_description, quantity_in_stock, buy_price, msrp FROM products;`
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
-		return nil, fmt.Errorf("error executing query", err)
+		return nil, err
 	}
 
 	defer rows.Close()
@@ -34,7 +34,7 @@ func (r *ProductQueryRepository) GetProducts(ctx context.Context) ([]model.Produ
 		if err := rows.Scan(
 			&a.ProductCode, &a.ProductName, &a.ProductLine, &a.ProductScale, &a.ProductVendor, &a.ProductDescription, &a.QuantityInStock, &a.BuyPrice, &a.Msrp,
 		); err != nil {
-			return nil, fmt.Errorf("error scanning rows", err)
+			return nil, err
 		}
 		products = append(products, a)
 	}
@@ -51,7 +51,7 @@ func (r *ProductQueryRepository) FindProduct(ctx context.Context, productCode st
 	rows, err := r.db.Query(ctx, `SELECT  product_code, product_name, product_line,product_scale, product_vendor, product_description, quantity_in_stock, buy_price, msrp FROM products WHERE product_code=$1`, productCode)
 
 	if err != nil {
-		return nil, fmt.Errorf("error executing query", err)
+		return nil, err
 	}
 
 	defer rows.Close()
@@ -61,7 +61,7 @@ func (r *ProductQueryRepository) FindProduct(ctx context.Context, productCode st
 		if err := rows.Scan(
 			&a.ProductCode, &a.ProductName, &a.ProductLine, &a.ProductScale, &a.ProductVendor, &a.ProductDescription, &a.QuantityInStock, &a.BuyPrice, &a.Msrp,
 		); err != nil {
-			return nil, fmt.Errorf("error scanning rows", err)
+			return nil, err
 		}
 
 	}
@@ -77,7 +77,7 @@ func (r *ProductQueryRepository) DeleteProduct(ctx context.Context, productCode 
 	rows, err := r.db.Query(ctx, `DELETE FROM products WHERE product_code=$1`, productCode)
 
 	if err != nil {
-		return fmt.Errorf("error executing query", err)
+		returnerr
 	}
 
 	defer rows.Close()

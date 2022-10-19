@@ -165,7 +165,7 @@ func (c AppConfig) StartDatabase(ctx context.Context) (*pgxpool.Pool, error) {
 
 	db, err := sql.Open("pgx", c.Database.ConnectionString)
 	if err != nil {
-		return nil, fmt.Errorf("error connecting", err)
+		return nil, er
 	}
 	defer db.Close()
 

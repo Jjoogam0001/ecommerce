@@ -24,7 +24,7 @@ func (r *ProductLineQueryRepository) GetProductLines(ctx context.Context) ([]mod
 	query := `SELECT  product_line, text_description , image FROM product_lines;`
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
-		return nil, fmt.Errorf("error executing query", err)
+		return nil, err
 	}
 
 	defer rows.Close()

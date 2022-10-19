@@ -23,7 +23,7 @@ func (r *PaymentQueryRepository) GetPayments(ctx context.Context) ([]model.Payme
 	query := ` SELECT  customer_number, check_number, payment_date, amount FROM payments; `
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
-		return nil, fmt.Errorf("error executing query", err)
+		return nil, err
 	}
 
 	defer rows.Close()
@@ -33,7 +33,7 @@ func (r *PaymentQueryRepository) GetPayments(ctx context.Context) ([]model.Payme
 		if err := rows.Scan(
 			&a.CustomerNumber, &a.CheckNumber, &a.PaymentDate, &a.Amount,
 		); err != nil {
-			return nil, fmt.Errorf("error scanning rows", err)
+			return nil, err
 		}
 		payments = append(payments, a)
 	}
@@ -51,7 +51,7 @@ func (r *PaymentQueryRepository) FindPayment(ctx context.Context, customerNumber
 	rows, err := r.db.Query(ctx, `SELECT  customer_number, check_number, payment_date, amount FROM payments WHERE customer_number=$1`, customerNumber)
 
 	if err != nil {
-		return nil, fmt.Errorf("error executing query", err)
+		return nil, err
 	}
 
 	defer rows.Close()
@@ -61,7 +61,7 @@ func (r *PaymentQueryRepository) FindPayment(ctx context.Context, customerNumber
 		if err := rows.Scan(
 			&a.CustomerNumber, &a.CheckNumber, &a.PaymentDate, &a.Amount,
 		); err != nil {
-			return nil, fmt.Errorf("error scanning rows", err)
+			return nil, err
 		}
 
 		pymts = append(pymts, a)
@@ -77,7 +77,7 @@ func (r *PaymentQueryRepository) DeletePayment(ctx context.Context, customerNumb
 	rows, err := r.db.Query(ctx, `DELETE FROM payments WHERE customer_number=$1`, customerNumber)
 
 	if err != nil {
-		return fmt.Errorf("error executing query", err)
+		returnerr
 	}
 
 	defer rows.Close()
