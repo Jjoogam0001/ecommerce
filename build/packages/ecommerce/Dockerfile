@@ -1,7 +1,7 @@
 # Dockerfile References: https://docs.docker.com/engine/reference/builder/
 
 # Start from the latest golang base image
-FROM golang:latest as builder
+FROM golang:latest as dependencies
 
 # Add Maintainer Info
 LABEL maintainer="Martin Jjooga"
@@ -22,9 +22,8 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
+FROM dependencies AS builder
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-X main.BuildVersion=$BUILD_VERSION" ./cmd/ecommerce/
-
-
 ######## Start a new stage from scratch #######
 FROM alpine:latest  
 
