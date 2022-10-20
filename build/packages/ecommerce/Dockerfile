@@ -3,6 +3,7 @@ FROM golang:latest as builder
 # Build the binary
 WORKDIR /app
 COPY ./ ./
+
 RUN CGO_ENABLED=0 GOOS=linux go build ./cmd/ecommerce/
 
 # Deploy into alpine
