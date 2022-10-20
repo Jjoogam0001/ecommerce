@@ -6,7 +6,6 @@ ARG  BUILD_VERSION
 WORKDIR /app
 
 COPY ./ ./
-COPY go.mod ./
 COPY go.sum ./
 
 # Check COPY is correct, go.mod is here
