@@ -1,4 +1,4 @@
-FROM golang:1.18-buster as builder
+FROM scratch
 
 ARG  BUILD_VERSION
 
