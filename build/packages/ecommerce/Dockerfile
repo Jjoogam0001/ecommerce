@@ -35,5 +35,5 @@ COPY --from=builder /app/config/config.json ./config/config.json
 COPY --from=builder /app/config/config.local.json ./config/config.local.json
 
 
-EXPOSE 3001
+EXPOSE 80
 CMD ["./ecommerce"]
