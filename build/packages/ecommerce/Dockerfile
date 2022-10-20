@@ -3,8 +3,8 @@ FROM golang:latest as builder
 # Build the binary
 WORKDIR /app
 COPY ./ ./
-RUN cp ./go.mod /.
-RUN cp ./go.sum /.
+RUN cp go.mod /.
+RUN cp go.sum /.
 RUN CGO_ENABLED=0 GOOS=linux go build ./cmd/ecommerce/
 
 # Deploy into alpine
