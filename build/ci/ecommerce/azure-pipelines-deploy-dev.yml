@@ -14,7 +14,7 @@ variables:
   dockerRegistryServiceConnection: '62da40d7-38ab-4bf1-b3de-d71d6b434c26'
   imageRepository: 'ecommerce'
   containerRegistry: 'ecommercedev00.azurecr.io'
-  dockerfilePath: '**/Dockerfile'
+  dockerfilePath: 'Dockerfile'
   tag: '$(Build.BuildId)'
   imagePullSecret: 'ecommercedev008790cf0b-auth'
 

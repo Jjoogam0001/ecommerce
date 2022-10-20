@@ -49,7 +49,7 @@ services:
   ecommerce:
     build:
       context: ../
-      dockerfile: build/packages/ecommerce/Dockerfile
+      dockerfile: Dockerfile
       args: 
         BUILD_VERSION: compose_dev
     depends_on:
