@@ -10,6 +10,7 @@ COPY go.mod ./
 COPY go.sum ./
 
 # Check COPY is correct, go.mod is here
+RUN go mod init
 RUN ls
 
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-X main.BuildVersion=$BUILD_VERSION" ./cmd/ecommerce/
