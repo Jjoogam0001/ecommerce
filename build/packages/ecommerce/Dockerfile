@@ -1,10 +1,16 @@
+# FROM golang:alpine
+# RUN mkdir /app
+# COPY . /app
+# WORKDIR /app
+# RUN go build -o main . 
+# CMD ["/app/main"]
+
 FROM golang:latest as builder
 
 # Build the binary
+RUN mkdir /app
+COPY . /app
 WORKDIR /app
-COPY ./ ./
-RUN cp ./go.mod /.
-RUN cp ./go.sum /.
 RUN CGO_ENABLED=0 GOOS=linux go build ./cmd/ecommerce/
 
 # Deploy into alpine
@@ -23,6 +29,7 @@ RUN apk add --no-cache \
 
 WORKDIR /app
 COPY --from=builder /app/ecommerce .
+COPY --from=builder /app/config/config.json .
 COPY --from=builder /app/config/config.local.json .
 
 EXPOSE 80
