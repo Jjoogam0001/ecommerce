@@ -2,7 +2,7 @@ FROM golang:latest as builder
 
 # Build the binary
 WORKDIR /app
-COPY ./ ./ ./
+COPY ./ ./ 
 
 RUN go mod download
 RUN CGO_ENABLED=0 GOOS=linux go build ./cmd/ecommerce/
