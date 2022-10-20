@@ -6,9 +6,6 @@ ARG  BUILD_VERSION
 WORKDIR /app
 
 COPY ./ ./
-COPY go.mod ./
-COPY go.sum ./
-
 
 RUN ls
 
