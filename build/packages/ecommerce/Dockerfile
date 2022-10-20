@@ -9,7 +9,7 @@ COPY ./ ./
 
 RUN ls
 
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-X main.BuildVersion=$BUILD_VERSION" ./cmd/ecommerce/
+RUN CGO_ENABLED=0 GOOS=linux go build  ./cmd/ecommerce/
 
 # Deploy into alpine
 FROM alpine:latest
