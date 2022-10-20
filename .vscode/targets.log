@@ -6,9 +6,8 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # PARTICULAR PURPOSE.
 
 # This program built for i386-apple-darwin11.3.0
- 
 
-# Make data base, printed on Wed Oct 19 21:39:16 2022
+# Make data base, printed on Thu Oct 20 03:24:10 2022
 
 # Variables
 
@@ -166,9 +165,9 @@ VSCODE_PID = 28254
 
 # Directories
 
-# . (device 16777234, inode 42339861): 19 files, no impossibilities.
+# . (device 16777234, inode 42339861): 22 files, no impossibilities.
 
-# 19 files, no impossibilities in 1 directories.
+# 22 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -198,7 +197,7 @@ test-sociable-api:
 #  Modification time never checked.
 #  File has not been updated.
 #  commands to execute (from `Makefile', line 30):
-	go test ./test/sociable/ecommerce -v
+	go test ./tests/sociable/ecommerce -v
 	
 
 # Not a target:
@@ -210,7 +209,7 @@ test-sociable-api:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-10-19 21:39:09
+#  Last modified 2022-10-19 22:20:47
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -229,7 +228,7 @@ build-ecommerce:
 #  Modification time never checked.
 #  File has not been updated.
 #  commands to execute (from `Makefile', line 27):
-	go build ./cmd/ecommerce/main.go -ldflags="-X main.BuildVersion=$(BUILD_VERSION_ARG)" ./cmd/ecommerce/main.go
+	go build ./cmd/ecommerce/main.go 
 	
 
 start-local: local-env
@@ -237,16 +236,7 @@ start-local: local-env
 #  Modification time never checked.
 #  File has not been updated.
 #  commands to execute (from `Makefile', line 21):
-	go run cmd/generatebets/main.go
-	
-
-gen-mocks-common:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (from `Makefile', line 33):
-	GO111MODULE=on mockgen --build_flags=--mod=mod -destination=./test/sociable/common/mocks/offer/offerclient.go -package mocks dev.azure.com/Derivco/Sports-CoreBetting/_git/bet-offer-client.git/offer/offerclient/offeroperations ClientService
-	GO111MODULE=on mockgen --build_flags=--mod=mod -destination=./test/sociable/common/mocks/db/ecommercedb.go -package mocks -source=./internal/app/ecommerce/dbaccess/ecommercedb.go
+	go run cmd/ecommerce/main.go
 	
 
 local-env:
@@ -276,7 +266,7 @@ docker-clean:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 41):
+#  commands to execute (from `Makefile', line 37):
 	@docker system prune --volumes --force
 	
 
@@ -292,12 +282,12 @@ gen-swagger:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 37):
-	swag init -g internal/app/ecommerce/httpserver.go -o api/ecommerce/docs
+#  commands to execute (from `Makefile', line 33):
+	swag init --parseDependency --parseInternal --parseDepth 1 -g api/api.go -o api/docs
 	
 
 # files hash-table stats:
-# Load=15/1024=1%, Rehash=0, Collisions=0/29=0%
+# Load=14/1024=1%, Rehash=0, Collisions=0/28=0%
 # VPATH Search Paths
 
 # No `vpath' search paths.
@@ -306,12 +296,11 @@ gen-swagger:
 
 # # of strings in strcache: 1
 # # of strcache buffers: 1
- 
-make: *** No rule to make target `all'.  Stop.
-
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Wed Oct 19 21:39:16 2022
+# Finished Make data base on Thu Oct 20 03:24:10 2022
 
  
+make: *** No rule to make target `all'.  Stop.
+

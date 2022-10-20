@@ -1,15 +1,17 @@
 FROM golang:1.18-buster as builder
 
 ARG  BUILD_VERSION
-
+RUN go env -w GOPRIVATE=dev.azure.com/martsoft/*
 
 WORKDIR /app
 
-COPY ./ ./
+COPY --link ./ ./
+COPY --link go.mod ./
+COPY --link go.sum ./
 
 RUN ls
 
-RUN CGO_ENABLED=0 GOOS=linux go build  ./cmd/ecommerce/
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-X main.BuildVersion=$BUILD_VERSION" ./cmd/ecommerce/
 
 # Deploy into alpine
 FROM alpine:latest
