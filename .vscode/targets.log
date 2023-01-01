@@ -7,8 +7,10 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 
 # This program built for i386-apple-darwin11.3.0
  
+make: *** No rule to make target `all'.  Stop.
 
-# Make data base, printed on Fri Oct 21 01:18:03 2022
+
+# Make data base, printed on Sun Jan  1 01:30:07 2023
 
 # Variables
 
@@ -33,24 +35,27 @@ _ = /usr/bin/make
 # makefile (from `Makefile', line 1)
 MAKEFILE_LIST :=  Makefile
 # environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+# environment
 __CFBundleIdentifier = com.microsoft.VSCode
 # environment
 INFOPATH = /opt/homebrew/share/info:
 # environment
 VSCODE_CWD = /
 # environment
-PATH = /Users/martinj/.rd/bin:/Users/martinj/opt/anaconda3/bin:/Users/martinj/bin:/usr/local/bin:/opt/local/bin:/opt/local/sbin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/local/bin:/opt/local/sbin:/Applications/Postgres.app/Contents/Versions/latest/bin:/Applications/Visual Studio Code.app/Contents/Resources/app/bin
+GOPROXY = https://proxy.golang.org,direct
 # environment
-LSCOLORS = Gxfxcxdxbxegedabagacad
+PATH = /Library/Frameworks/Python.framework/Versions/3.10/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/local/bin:/opt/local/sbin:/Applications/Postgres.app/Contents/Versions/latest/bin
+# environment
+GOPATH = /Users/martinj/go
+# environment
+LaunchInstanceID = E355D530-0D4A-4057-8EF7-FD7CAD0C94B3
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # default
- 
-make: *** No rule to make target `all'.  Stop.
-
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.h69YDuqvds/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.Q98ZFbeQSR/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
@@ -60,21 +65,19 @@ HOMEBREW_CELLAR = /opt/homebrew/Cellar
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = undefined
 # environment
-MANPATH = /opt/local/share/man:/opt/homebrew/share/man::
+MANPATH = /opt/homebrew/share/man:
 # environment
-VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+GOMODCACHE = /Users/martinj/go/pkg/mod
 # environment
 HOME = /Users/martinj
 # default
 MAKEFILEPATH = $(shell /usr/bin/xcode-select -print-path 2>/dev/null || echo /Developer)/Makefiles
 # environment
-VSCODE_CODE_CACHE_PATH = /Users/martinj/Library/Application Support/Code/CachedData/d045a5eda657f4d7b676dedbfa7aab8207f8a075
+VSCODE_CODE_CACHE_PATH = /Users/martinj/Library/Application Support/Code/CachedData/e8a3071ea4344d9d48ef8a4df2c097372b0c5161
 # environment
 LOGNAME = martinj
 # environment
 APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
-# environment
-ZSH = /Users/martinj/.oh-my-zsh
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # automatic
@@ -86,15 +89,13 @@ MAKE = $(MAKE_COMMAND)
 # default
 MAKECMDGOALS := all
 # environment
-SHLVL = 1
+SHLVL = 2
 # default
 MAKE_VERSION := 3.81
 # environment
-USER = martinj
+USER = martin.jjooga
 # makefile
 .DEFAULT_GOAL := local-env
-# environment
-LESS = -R
 # automatic
 %D = $(patsubst %/,%,$(dir $%))
 # default
@@ -106,7 +107,7 @@ TMPDIR = /var/folders/0n/dkkp2y896nxfhlpn82qwfs5c2np__r/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/martinj/Library/Application Support/Code/1.72.2-main.sock
+VSCODE_IPC_HOOK = /Users/martinj/Library/Application Support/Code/1.74.2-main.sock
 # environment
 MallocNanoZone = 0
 # makefile
@@ -116,7 +117,7 @@ MFLAGS = -Rrqp
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.41780674.41780680
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.49532765.49532771
 # environment
 HOMEBREW_PREFIX = /opt/homebrew
 # automatic
@@ -134,14 +135,14 @@ MAKEFILES :=
 # automatic
 <F = $(notdir $<)
 # environment
-PAGER = less
-# environment
 LC_ALL = C
 # makefile (from `Makefile', line 1)
 define setup_env
     $(eval include .env)
     $(eval export)
 endef
+# environment
+SECURITYSESSIONID = 186b2
 # automatic
 ^F = $(notdir $^)
 # default
@@ -153,9 +154,9 @@ MAKELEVEL := 0
 # environment
 LANG = C
 # environment
-VSCODE_PID = 28254
+VSCODE_PID = 1210
 # variable set hash-table stats:
-# Load=68/1024=7%, Rehash=0, Collisions=1/92=1%
+# Load=69/1024=7%, Rehash=0, Collisions=2/93=2%
 
 # Pattern-specific Variable Values
 
@@ -163,7 +164,7 @@ VSCODE_PID = 28254
 
 # Directories
 
-# . (device 16777234, inode 42339861): 22 files, no impossibilities.
+# . (device 16777233, inode 42339861): 22 files, no impossibilities.
 
 # 22 files, no impossibilities in 1 directories.
 
@@ -207,7 +208,7 @@ test-sociable-api:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-10-19 22:20:47
+#  Last modified 2022-12-28 01:20:36
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -297,6 +298,6 @@ gen-swagger:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Fri Oct 21 01:18:03 2022
+# Finished Make data base on Sun Jan  1 01:30:07 2023
 
  

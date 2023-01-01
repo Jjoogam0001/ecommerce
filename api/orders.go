@@ -42,7 +42,7 @@ func (a *StudentController) WithQueryRepository(f StudentQueryRepositoryFactory)
 
 func (a *StudentController) RegisterRoutes(e *echo.Echo) {
 	studentGroup := e.Group("/orders", middleware.Transaction(a.txProvider))
-	studentGroup.GET("/get_orders", a.getorders)
+	studentGroup.GET("/orders", a.getorders)
 
 }
 
@@ -50,7 +50,7 @@ func (a *StudentController) RegisterRoutes(e *echo.Echo) {
 // @Descript Orders
 // @Produce json
 // @Tags Orders
-// @Router /orders/get_orders [get]
+// @Router /orders/orders [get]
 // @Success 200 {object} model.Order
 // @Failure 400 {object} model.ErrValidation
 func (a *StudentController) getorders(c echo.Context) error {

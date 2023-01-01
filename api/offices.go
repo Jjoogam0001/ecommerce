@@ -2,6 +2,11 @@ package api
 
 import (
 	"context"
+	"dev.azure.com/jjoogam/Ecommerce-core/internal/metrics"
+	"emperror.dev/errors"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"dev.azure.com/jjoogam/Ecommerce-core/api/middleware"
@@ -21,6 +26,7 @@ type (
 		GetOffices(ctx context.Context) ([]model.Office, error)
 		FindOffice(ctx context.Context, officeCode string) (*model.Office, error)
 		DeleteOffice(ctx context.Context, officeCode string) error
+		UpdateOffice(ctx context.Context, office model.Office) error
 	}
 
 	OfficeQueryRepositoryFactory func(pgx.Tx) OfficeQueryRepository
@@ -44,9 +50,10 @@ func (a *OfficeController) WithQueryRepository(f OfficeQueryRepositoryFactory) *
 
 func (a *OfficeController) RegisterRoutes(e *echo.Echo) {
 	officeGroup := e.Group("/offices", middleware.Transaction(a.txProvider))
-	officeGroup.GET("/get_offices", a.GetOffices)
-	officeGroup.GET("/get_office", a.findOffice)
-	officeGroup.DELETE("/delete_office", a.deleteOffice)
+	officeGroup.GET("/offices", a.GetOffices)
+	officeGroup.GET("/get", a.findOffice)
+	officeGroup.DELETE("/delete", a.deleteOffice)
+	officeGroup.PATCH("/update", a.UpdateOffice)
 
 }
 
@@ -54,7 +61,7 @@ func (a *OfficeController) RegisterRoutes(e *echo.Echo) {
 // @Description Gets all Offices
 // @Tags 	Offices
 // @Produce json
-// @Router /offices/get_offices [get]
+// @Router /offices/offices [get]
 // @Success 200 {object} model.Office
 // @Failure 400 {object} model.ErrValidation
 func (a *OfficeController) GetOffices(c echo.Context) error {
@@ -78,7 +85,7 @@ func (a *OfficeController) GetOffices(c echo.Context) error {
 // @Description Fetch a single Office
 // @Tags Offices
 // @Produce json
-// @Router /offices/get_office [get]
+// @Router /offices/get [get]
 // @Param office_code query string true "office_code mandatory"
 // @Success 200 {object} model.Office
 // @Failure 400 {object} model.ErrValidation
@@ -143,4 +150,39 @@ func (h *OfficeController) decodeOffice(c echo.Context) (*string, error) {
 	}
 
 	return &customerNumber, nil
+}
+
+// @Summary Updates a  Office
+// @Description updates a single Office
+// @Tags Offices
+// @Produce json
+// @Router /offices/update [patch]
+// @Param Office body model.Office true "office_code"
+// @Success 200 {object} model.Office
+// @Failure 400 {object} model.ErrValidation
+func (a *OfficeController) UpdateOffice(c echo.Context) error {
+	ctx := context.Background()
+	db, err := middleware.FromTransactionContext(c)
+	if err != nil {
+		metrics.DBErrorInc()
+		return errors.Wrap(err, "unable to resolve transaction")
+	}
+	r := a.queryRepositoryFactory(db)
+	requestbody, err := ioutil.ReadAll(c.Request().Body)
+
+	var request model.Office
+	err = json.Unmarshal(requestbody, &request)
+	if err != nil {
+		return err
+	}
+	if err != nil {
+		return errors.Wrap(err, "error getting employee information from the request")
+	}
+
+	err = r.UpdateOffice(ctx, request)
+	if err != nil {
+		return fmt.Errorf("Error in the request", err.Error())
+	}
+	return c.String(http.StatusOK, "Office updated successfully")
+
 }

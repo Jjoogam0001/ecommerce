@@ -2,6 +2,11 @@ package api
 
 import (
 	"context"
+	"dev.azure.com/jjoogam/Ecommerce-core/internal/metrics"
+	"emperror.dev/errors"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"dev.azure.com/jjoogam/Ecommerce-core/api/middleware"
@@ -21,6 +26,7 @@ type (
 		GetProducts(ctx context.Context) ([]model.Product, error)
 		FindProduct(ctx context.Context, productCode string) (*model.Product, error)
 		DeleteProduct(ctx context.Context, productCode string) error
+		UpdateProduct(ctx context.Context, product model.Product) error
 	}
 
 	ProductQueryRepositoryFactory func(pgx.Tx) ProductQueryRepository
@@ -44,9 +50,10 @@ func (a *ProductController) WithQueryRepository(f ProductQueryRepositoryFactory)
 
 func (a *ProductController) RegisterRoutes(e *echo.Echo) {
 	productGroup := e.Group("/products", middleware.Transaction(a.txProvider))
-	productGroup.GET("/get_products", a.getorders)
-	productGroup.GET("/get_product", a.findProduct)
-	productGroup.DELETE("/delete_product", a.deleteProduct)
+	productGroup.GET("/products", a.getorders)
+	productGroup.GET("/get", a.findProduct)
+	productGroup.DELETE("/delete", a.deleteProduct)
+	productGroup.PATCH("/update", a.UpdateProduct)
 
 }
 
@@ -54,7 +61,7 @@ func (a *ProductController) RegisterRoutes(e *echo.Echo) {
 // @Descript Products
 // @Produce json
 // @Tags Products
-// @Router /products/get_products [get]
+// @Router /products/products [get]
 // @Success 200 {object} model.Product
 // @Failure 400 {object} model.ErrValidation
 func (a *ProductController) getorders(c echo.Context) error {
@@ -78,7 +85,7 @@ func (a *ProductController) getorders(c echo.Context) error {
 // @Description Fetch a single Product
 // @Tags Products
 // @Produce json
-// @Router /products/get_product [get]
+// @Router /products/get [get]
 // @Param product_code query string true "product_code mandatory"
 // @Success 200 {object} model.Product
 // @Failure 400 {object} model.ErrValidation
@@ -106,7 +113,7 @@ func (a *ProductController) findProduct(c echo.Context) error {
 // @Description Deletes a single Product
 // @Tags Products
 // @Produce json
-// @Router /products/delete_product [delete]
+// @Router /products/delete [delete]
 // @Param product_code query string true "product_code mandatory"
 // @Success 200 {object} model.Product
 // @Failure 400 {object} model.ErrValidation
@@ -144,4 +151,36 @@ func (h *ProductController) decodeProduct(c echo.Context) (*string, error) {
 	}
 
 	return &customerNumber, nil
+}
+
+// @Summary Updates a  Product
+// @Description updates a single Product
+// @Tags Products
+// @Produce json
+// @Router /products/update [patch]
+// @Param product body model.Product true "quantity_in_stock"
+// @Success 200 {object} model.Product
+// @Failure 400 {object} model.ErrValidation
+func (a *ProductController) UpdateProduct(c echo.Context) error {
+	ctx := context.Background()
+	db, err := middleware.FromTransactionContext(c)
+	if err != nil {
+		metrics.DBErrorInc()
+		return errors.Wrap(err, "unable to resolve transaction")
+	}
+	r := a.queryRepositoryFactory(db)
+	requestbody, err := ioutil.ReadAll(c.Request().Body)
+
+	var request model.Product
+	err = json.Unmarshal(requestbody, &request)
+	if err != nil {
+		return err
+	}
+
+	err = r.UpdateProduct(ctx, request)
+	if err != nil {
+		return fmt.Errorf("Error in the request", err.Error())
+	}
+	return c.String(http.StatusOK, "Product updated successfully")
+
 }

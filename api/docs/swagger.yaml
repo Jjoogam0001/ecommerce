@@ -1,7 +1,7 @@
 definitions:
   model.Customer:
     properties:
-      address_line:
+      address_line1:
         type: string
       address_line2:
         type: string
@@ -19,6 +19,8 @@ definitions:
         type: string
       customer_number:
         type: integer
+      email:
+        type: string
       phone:
         type: string
       postal_code:
@@ -174,53 +176,7 @@ info:
   title: Martsoft Inc E-Commerce API 2.0
   version: "1.0"
 paths:
-  /customers/delete_customer:
-    delete:
-      description: Deletes a single customer
-      parameters:
-      - description: customer_number mandatory
-        in: query
-        name: customer_number
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Customer'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/model.ErrValidation'
-      summary: Deletes a single customer
-      tags:
-      - Customer
-  /customers/get_customer:
-    get:
-      description: Fetch a single customer
-      parameters:
-      - description: customer_number mandatory
-        in: query
-        name: customer_number
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Customer'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/model.ErrValidation'
-      summary: Retrieve a single customer
-      tags:
-      - Customer
-  /customers/get_customers:
+  /customers/customers:
     get:
       description: Gets all customers
       produces:
@@ -237,7 +193,77 @@ paths:
       summary: Retrieve all customers
       tags:
       - Customer
-  /employees/delete_employee:
+  /customers/delete:
+    delete:
+      description: Deletes a single customer
+      parameters:
+      - description: email mandatory
+        in: query
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Customer'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrValidation'
+      summary: Deletes a single customer
+      tags:
+      - Customer
+  /customers/get:
+    get:
+      description: Fetch a single customer
+      parameters:
+      - description: email mandatory
+        in: query
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Customer'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrValidation'
+      summary: Retrieve a single customer
+      tags:
+      - Customer
+  /customers/update:
+    patch:
+      description: updates a single customer
+      parameters:
+      - description: customer_number
+        in: body
+        name: customer
+        required: true
+        schema:
+          $ref: '#/definitions/model.Customer'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Customer'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrValidation'
+      summary: Updates a  customer
+      tags:
+      - Customer
+  /employees/delete:
     delete:
       description: deleted a single Employee
       parameters:
@@ -260,7 +286,24 @@ paths:
       summary: deletes a single Employee
       tags:
       - Employees
-  /employees/get_employee:
+  /employees/employees:
+    get:
+      description: Gets all Employees
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Employee'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrValidation'
+      summary: Retrieve all Employees
+      tags:
+      - Employees
+  /employees/get:
     get:
       description: Fetch a single Employee
       parameters:
@@ -283,9 +326,16 @@ paths:
       summary: Retrieve a single Employee
       tags:
       - Employees
-  /employees/get_employees:
-    get:
-      description: Gets all Employees
+  /employees/update:
+    patch:
+      description: updates a single Employee
+      parameters:
+      - description: employee_number
+        in: body
+        name: customer
+        required: true
+        schema:
+          $ref: '#/definitions/model.Employee'
       produces:
       - application/json
       responses:
@@ -297,7 +347,7 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/model.ErrValidation'
-      summary: Retrieve all Employees
+      summary: Updates a  Employee
       tags:
       - Employees
   /offices/delete_office:
@@ -323,7 +373,7 @@ paths:
       summary: Deletes a single Office
       tags:
       - Offices
-  /offices/get_office:
+  /offices/get:
     get:
       description: Fetch a single Office
       parameters:
@@ -346,7 +396,7 @@ paths:
       summary: Retrieve a single Office
       tags:
       - Offices
-  /offices/get_offices:
+  /offices/offices:
     get:
       description: Gets all Offices
       produces:
@@ -363,7 +413,31 @@ paths:
       summary: Retrieve all Offices
       tags:
       - Offices
-  /orderDetails/delete_orderDetail:
+  /offices/update:
+    patch:
+      description: updates a single Office
+      parameters:
+      - description: office_code
+        in: body
+        name: Office
+        required: true
+        schema:
+          $ref: '#/definitions/model.Office'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Office'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrValidation'
+      summary: Updates a  Office
+      tags:
+      - Offices
+  /orderDetails/delete:
     delete:
       description: Delete order details
       parameters:
@@ -386,6 +460,22 @@ paths:
       summary: Delete order details
       tags:
       - Orders
+  /orderDetails/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.OrderDetail'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrValidation'
+      summary: Retrieve all OrderDetails
+      tags:
+      - OrderDetails
   /orderDetails/get_orderDetail:
     get:
       description: Fetch order details
@@ -408,9 +498,17 @@ paths:
             $ref: '#/definitions/model.ErrValidation'
       summary: Retrieve order details
       tags:
-      - Orders
-  /orderDetails/get_orderDetails:
-    get:
+      - OrderDetails
+  /orderDetails/update:
+    patch:
+      description: updates OrderDetail
+      parameters:
+      - description: order_number
+        in: body
+        name: customer
+        required: true
+        schema:
+          $ref: '#/definitions/model.OrderDetail'
       produces:
       - application/json
       responses:
@@ -422,10 +520,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/model.ErrValidation'
-      summary: Retrieve all OrderDetails
+      summary: Updates a  OrderDetail
       tags:
       - OrderDetails
-  /orders/get_orders:
+  /orders/orders:
     get:
       produces:
       - application/json
@@ -441,7 +539,7 @@ paths:
       summary: Retrieve all Orders
       tags:
       - Orders
-  /payments/delete_payment:
+  /payments/delete:
     delete:
       description: deletes a Payment
       parameters:
@@ -464,7 +562,7 @@ paths:
       summary: deletes a  Payment
       tags:
       - Payments
-  /payments/get_payment:
+  /payments/get:
     get:
       description: Fetch a Payment
       parameters:
@@ -484,11 +582,18 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/model.ErrValidation'
-      summary: Retrieve a  Payment
       tags:
       - Payments
-  /payments/get_payments:
-    get:
+  /payments/update:
+    patch:
+      description: updates a single Employee
+      parameters:
+      - description: payment_date
+        in: body
+        name: payment
+        required: true
+        schema:
+          $ref: '#/definitions/model.Payment'
       produces:
       - application/json
       responses:
@@ -500,7 +605,7 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/model.ErrValidation'
-      summary: Retrieve all Payments
+      summary: Updates a  Payment
       tags:
       - Payments
   /productLines/get_productLines:
@@ -519,7 +624,7 @@ paths:
       summary: Retrieve all ProductLines
       tags:
       - ProductLines
-  /products/delete_product:
+  /products/delete:
     delete:
       description: Deletes a single Product
       parameters:
@@ -542,7 +647,7 @@ paths:
       summary: Deletes a single Product
       tags:
       - Products
-  /products/get_product:
+  /products/get:
     get:
       description: Fetch a single Product
       parameters:
@@ -565,7 +670,7 @@ paths:
       summary: Retrieve a single Product
       tags:
       - Products
-  /products/get_products:
+  /products/products:
     get:
       produces:
       - application/json
@@ -579,6 +684,30 @@ paths:
           schema:
             $ref: '#/definitions/model.ErrValidation'
       summary: Retrieve all Payments
+      tags:
+      - Products
+  /products/update:
+    patch:
+      description: updates a single Product
+      parameters:
+      - description: quantity_in_stock
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/model.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Product'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrValidation'
+      summary: Updates a  Product
       tags:
       - Products
 schemes:

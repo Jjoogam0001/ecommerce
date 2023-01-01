@@ -2,6 +2,11 @@ package api
 
 import (
 	"context"
+	"dev.azure.com/jjoogam/Ecommerce-core/internal/metrics"
+	"emperror.dev/errors"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 
@@ -22,6 +27,7 @@ type (
 		GetOrderDetails(ctx context.Context) ([]model.OrderDetail, error)
 		FindOrderDetails(ctx context.Context, orderNumber int) ([]model.OrderDetail, error)
 		DeleteOrder(ctx context.Context, orderNumber int) error
+		UpdateOrderDetails(ctx context.Context, ordersDetails model.OrderDetail) error
 	}
 
 	OrderDetailQueryRepositoryFactory func(pgx.Tx) OrderDetailQueryRepository
@@ -48,6 +54,7 @@ func (a *OrderDetailController) RegisterRoutes(e *echo.Echo) {
 	orderDetailGroup.GET("/get_orderDetails", a.GetOrderDetails)
 	orderDetailGroup.GET("/get_orderDetail", a.findOrderDetails)
 	orderDetailGroup.DELETE("/delete_orderDetail", a.deleteOrderDetails)
+	orderDetailGroup.PATCH("/update", a.UpdateOrderDetails)
 
 }
 
@@ -55,7 +62,7 @@ func (a *OrderDetailController) RegisterRoutes(e *echo.Echo) {
 // @Descript OrderDetails
 // @Tags OrderDetails
 // @Produce json
-// @Router /orderDetails/get_orderDetails [get]
+// @Router /orderDetails/get [get]
 // @Success 200 {object} model.OrderDetail
 // @Failure 400 {object} model.ErrValidation
 func (a *OrderDetailController) GetOrderDetails(c echo.Context) error {
@@ -77,7 +84,7 @@ func (a *OrderDetailController) GetOrderDetails(c echo.Context) error {
 
 // @Summary Retrieve order details
 // @Description Fetch order details
-// @Tags Orders
+// @Tags OrderDetails
 // @Produce json
 // @Router /orderDetails/get_orderDetail [get]
 // @Param order_number query int true "order_number mandatory"
@@ -107,7 +114,7 @@ func (a *OrderDetailController) findOrderDetails(c echo.Context) error {
 // @Description Delete order details
 // @Tags Orders
 // @Produce json
-// @Router /orderDetails/delete_orderDetail [delete]
+// @Router /orderDetails/delete [delete]
 // @Param order_number query int true "order_number mandatory"
 // @Success 200 {object} model.Order
 // @Failure 400 {object} model.ErrValidation
@@ -151,4 +158,36 @@ func (h *OrderDetailController) decodeOrderDetails(c echo.Context) (*int, error)
 	}
 
 	return &cuId, nil
+}
+
+// @Summary Updates a  OrderDetail
+// @Description updates OrderDetail
+// @Tags OrderDetails
+// @Produce json
+// @Router /orderDetails/update [patch]
+// @Param customer body model.OrderDetail true "order_number"
+// @Success 200 {object} model.OrderDetail
+// @Failure 400 {object} model.ErrValidation
+func (a *OrderDetailController) UpdateOrderDetails(c echo.Context) error {
+	ctx := context.Background()
+	db, err := middleware.FromTransactionContext(c)
+	if err != nil {
+		metrics.DBErrorInc()
+		return errors.Wrap(err, "unable to resolve transaction")
+	}
+	r := a.queryRepositoryFactory(db)
+	requestbody, err := ioutil.ReadAll(c.Request().Body)
+
+	var request model.OrderDetail
+	err = json.Unmarshal(requestbody, &request)
+	if err != nil {
+		return err
+	}
+
+	err = r.UpdateOrderDetails(ctx, request)
+	if err != nil {
+		return fmt.Errorf("Error in the request", err.Error())
+	}
+	return c.String(http.StatusOK, "OrderDetail updated successfully")
+
 }

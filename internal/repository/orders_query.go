@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"dev.azure.com/jjoogam/Ecommerce-core/internal/metrics"
+	"time"
 
 	"dev.azure.com/jjoogam/Ecommerce-core/model"
 	"github.com/jackc/pgx/v4"
@@ -17,7 +19,7 @@ func NewOrderQueryRepository(db pgx.Tx) *OrderQueryRepository {
 	return &OrderQueryRepository{db}
 }
 func (r *OrderQueryRepository) Getorders(ctx context.Context) ([]model.Order, error) {
-
+	defer metrics.DBCallSince(time.Now())
 	orders := []model.Order{}
 	query := ` SELECT order_number,order_date,required_date,shipped_date,status,customer_number,comments from orders where comments is not NULL; `
 	rows, err := r.db.Query(ctx, query)

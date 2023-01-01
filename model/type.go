@@ -1,6 +1,8 @@
 package model
 
-import "github.com/jackc/pgtype"
+import (
+	"github.com/jackc/pgtype"
+)
 
 type (
 	Order struct {
@@ -14,12 +16,13 @@ type (
 	}
 
 	Customer struct {
-		CustomerNumber    int    `json:"customer_number"`
+		Email             string `json:"email"`
+		Customer_number   int    `json:"customer_number"`
 		CustomerName      string `json:"customer_name"`
 		ContactLastName   string `json:"contact_last_name"`
 		ContactFirstName  string `json:"contact_first_name"`
 		Phone             string `json:"phone"`
-		AddressLine       string `json:"address_line"`
+		AddressLine       string `json:"address_line1"`
 		AddressLine2      string `json:"address_line2"`
 		City              string `json:"city"`
 		State             string `json:"state"`
@@ -27,6 +30,9 @@ type (
 		Country           string `json:"country"`
 		SalesRepEmpNumber int32  `json:"sales_rep_employee_number"`
 		CreditLimit       int64  `json:"credit_limit"`
+	}
+	CreateCustomerRequest struct {
+		Customer Customer `json:"customer"`
 	}
 
 	Employee struct {

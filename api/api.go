@@ -1,12 +1,14 @@
 package api
 
 import (
+	"dev.azure.com/jjoogam/Ecommerce-core/api/docs"
+	"dev.azure.com/jjoogam/Ecommerce-core/internal/metrics"
 	"net/http"
 
-	"dev.azure.com/jjoogam/Ecommerce-core/api/docs/swagger"
 	"dev.azure.com/jjoogam/Ecommerce-core/api/middleware"
 	"dev.azure.com/jjoogam/Ecommerce-core/config"
 	"github.com/labstack/echo/v4"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
@@ -34,9 +36,12 @@ func NewAPI(c config.AppConfig) *API {
 	e := echo.New()
 
 	middleware.UseLogger(e)
+	e.Use(metrics.Prometheus())
+	e.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
 	e.GET("/swagger/*", echoSwagger.EchoWrapHandler())
-	e.GET("/healthcheck", health)
+	e.GET("/health", health)
 	initSwagerInfo(c)
+
 	return &API{server: e}
 }
 
@@ -71,10 +76,10 @@ func (a *API) Close() error {
 	return a.server.Close()
 }
 func initSwagerInfo(c config.AppConfig) {
-	swagger.SwaggerInfo.Title = "Martsoft Inc E-Commerce API 2.0"
-	swagger.SwaggerInfo.Description = "This is the API E-Commerce businesses."
-	swagger.SwaggerInfo.Version = "1.0"
-	swagger.SwaggerInfo.Host = c.Swagger.Host
-	swagger.SwaggerInfo.BasePath = ""
-	swagger.SwaggerInfo.Schemes = []string{"http", "https"}
+	docs.SwaggerInfo.Title = "Martsoft Inc E-Commerce API 2.0"
+	docs.SwaggerInfo.Description = "This is the API E-Commerce businesses."
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.Host = c.Swagger.Host
+	docs.SwaggerInfo.BasePath = ""
+	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 }

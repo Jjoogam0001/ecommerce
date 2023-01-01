@@ -10,6 +10,7 @@ import (
 
 func main() {
 	c, err := config.BuildHost().ReadAppConfig()
+
 	if err != nil {
 		log.Fatal(err)
 	}

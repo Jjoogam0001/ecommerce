@@ -2,6 +2,11 @@ package api
 
 import (
 	"context"
+	"dev.azure.com/jjoogam/Ecommerce-core/internal/metrics"
+	"emperror.dev/errors"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 
@@ -22,6 +27,7 @@ type (
 		GetPayments(ctx context.Context) ([]model.Payment, error)
 		FindPayment(ctx context.Context, customerNumber int) ([]model.Payment, error)
 		DeletePayment(ctx context.Context, customerNumber int) error
+		UpdatePayment(ctx context.Context, payment model.Payment) error
 	}
 
 	PaymentQueryRepositoryFactory func(pgx.Tx) PaymentQueryRepository
@@ -45,9 +51,10 @@ func (a *PaymentController) WithQueryRepository(f PaymentQueryRepositoryFactory)
 
 func (a *PaymentController) RegisterRoutes(e *echo.Echo) {
 	PaymentGroup := e.Group("/payments", middleware.Transaction(a.txProvider))
-	PaymentGroup.GET("/get_payments", a.GetPayments)
-	PaymentGroup.GET("/get_payment", a.findPayment)
-	PaymentGroup.DELETE("/delete_payment", a.deletePayment)
+	PaymentGroup.GET("/payments", a.GetPayments)
+	PaymentGroup.GET("/get", a.findPayment)
+	PaymentGroup.DELETE("/delete", a.deletePayment)
+	PaymentGroup.PATCH("/delete", a.UpdatePayment)
 
 }
 
@@ -55,7 +62,7 @@ func (a *PaymentController) RegisterRoutes(e *echo.Echo) {
 // @Descript Payments
 // @Produce json
 // @Tags Payments
-// @Router /payments/get_payments [get]
+// @Router /payments/get [get]
 // @Success 200 {object} model.Payment
 // @Failure 400 {object} model.ErrValidation
 func (a *PaymentController) GetPayments(c echo.Context) error {
@@ -75,11 +82,11 @@ func (a *PaymentController) GetPayments(c echo.Context) error {
 	return c.JSON(http.StatusOK, orders)
 }
 
-// @Summary Retrieve a  Payment
+// / @Summary Retrieve a  Payment
 // @Description Fetch a Payment
 // @Tags Payments
 // @Produce json
-// @Router /payments/get_payment [get]
+// @Router /payments/get [get]
 // @Param customer_number query int true "customer_number mandatory"
 // @Success 200 {object} model.Payment
 // @Failure 400 {object} model.ErrValidation
@@ -107,7 +114,7 @@ func (a *PaymentController) findPayment(c echo.Context) error {
 // @Description deletes a Payment
 // @Tags Payments
 // @Produce json
-// @Router /payments/delete_payment [delete]
+// @Router /payments/delete [delete]
 // @Param customer_number query int true "customer_number mandatory"
 // @Success 200 {object} model.Payment
 // @Failure 400 {object} model.ErrValidation
@@ -149,4 +156,36 @@ func (h *PaymentController) decodePayment(c echo.Context) (*int, error) {
 	}
 
 	return &cuId, nil
+}
+
+// @Summary Updates a  Payment
+// @Description updates a single Employee
+// @Tags Payments
+// @Produce json
+// @Router /payments/update [patch]
+// @Param payment body model.Payment true "payment_date"
+// @Success 200 {object} model.Payment
+// @Failure 400 {object} model.ErrValidation
+func (a *PaymentController) UpdatePayment(c echo.Context) error {
+	ctx := context.Background()
+	db, err := middleware.FromTransactionContext(c)
+	if err != nil {
+		metrics.DBErrorInc()
+		return errors.Wrap(err, "unable to resolve transaction")
+	}
+	r := a.queryRepositoryFactory(db)
+	requestbody, err := ioutil.ReadAll(c.Request().Body)
+
+	var request model.Payment
+	err = json.Unmarshal(requestbody, &request)
+	if err != nil {
+		return err
+	}
+
+	err = r.UpdatePayment(ctx, request)
+	if err != nil {
+		return fmt.Errorf("Error in the request", err.Error())
+	}
+	return c.String(http.StatusOK, "Customer updated successfully")
+
 }

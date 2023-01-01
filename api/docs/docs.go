@@ -19,77 +19,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/customers/delete_customer": {
-            "delete": {
-                "description": "Deletes a single customer",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Customer"
-                ],
-                "summary": "Deletes a single customer",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "customer_number mandatory",
-                        "name": "customer_number",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Customer"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/model.ErrValidation"
-                        }
-                    }
-                }
-            }
-        },
-        "/customers/get_customer": {
-            "get": {
-                "description": "Fetch a single customer",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Customer"
-                ],
-                "summary": "Retrieve a single customer",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "customer_number mandatory",
-                        "name": "customer_number",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Customer"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/model.ErrValidation"
-                        }
-                    }
-                }
-            }
-        },
-        "/customers/get_customers": {
+        "/customers/customers": {
             "get": {
                 "description": "Gets all customers",
                 "produces": [
@@ -115,7 +45,114 @@ const docTemplate = `{
                 }
             }
         },
-        "/employees/delete_employee": {
+        "/customers/delete": {
+            "delete": {
+                "description": "Deletes a single customer",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Customer"
+                ],
+                "summary": "Deletes a single customer",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "email mandatory",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Customer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrValidation"
+                        }
+                    }
+                }
+            }
+        },
+        "/customers/get": {
+            "get": {
+                "description": "Fetch a single customer",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Customer"
+                ],
+                "summary": "Retrieve a single customer",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "email mandatory",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Customer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrValidation"
+                        }
+                    }
+                }
+            }
+        },
+        "/customers/update": {
+            "patch": {
+                "description": "updates a single customer",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Customer"
+                ],
+                "summary": "Updates a  customer",
+                "parameters": [
+                    {
+                        "description": "customer_number",
+                        "name": "customer",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Customer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Customer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrValidation"
+                        }
+                    }
+                }
+            }
+        },
+        "/employees/delete": {
             "delete": {
                 "description": "deleted a single Employee",
                 "produces": [
@@ -150,7 +187,33 @@ const docTemplate = `{
                 }
             }
         },
-        "/employees/get_employee": {
+        "/employees/employees": {
+            "get": {
+                "description": "Gets all Employees",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Retrieve all Employees",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Employee"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrValidation"
+                        }
+                    }
+                }
+            }
+        },
+        "/employees/get": {
             "get": {
                 "description": "Fetch a single Employee",
                 "produces": [
@@ -185,16 +248,27 @@ const docTemplate = `{
                 }
             }
         },
-        "/employees/get_employees": {
-            "get": {
-                "description": "Gets all Employees",
+        "/employees/update": {
+            "patch": {
+                "description": "updates a single Employee",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Employees"
                 ],
-                "summary": "Retrieve all Employees",
+                "summary": "Updates a  Employee",
+                "parameters": [
+                    {
+                        "description": "employee_number",
+                        "name": "customer",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Employee"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -246,7 +320,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/offices/get_office": {
+        "/offices/get": {
             "get": {
                 "description": "Fetch a single Office",
                 "produces": [
@@ -281,7 +355,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/offices/get_offices": {
+        "/offices/offices": {
             "get": {
                 "description": "Gets all Offices",
                 "produces": [
@@ -307,7 +381,44 @@ const docTemplate = `{
                 }
             }
         },
-        "/orderDetails/delete_orderDetail": {
+        "/offices/update": {
+            "patch": {
+                "description": "updates a single Office",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Offices"
+                ],
+                "summary": "Updates a  Office",
+                "parameters": [
+                    {
+                        "description": "office_code",
+                        "name": "Office",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Office"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Office"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrValidation"
+                        }
+                    }
+                }
+            }
+        },
+        "/orderDetails/delete": {
             "delete": {
                 "description": "Delete order details",
                 "produces": [
@@ -342,6 +453,31 @@ const docTemplate = `{
                 }
             }
         },
+        "/orderDetails/get": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "OrderDetails"
+                ],
+                "summary": "Retrieve all OrderDetails",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.OrderDetail"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrValidation"
+                        }
+                    }
+                }
+            }
+        },
         "/orderDetails/get_orderDetail": {
             "get": {
                 "description": "Fetch order details",
@@ -349,7 +485,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Orders"
+                    "OrderDetails"
                 ],
                 "summary": "Retrieve order details",
                 "parameters": [
@@ -377,15 +513,27 @@ const docTemplate = `{
                 }
             }
         },
-        "/orderDetails/get_orderDetails": {
-            "get": {
+        "/orderDetails/update": {
+            "patch": {
+                "description": "updates OrderDetail",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "OrderDetails"
                 ],
-                "summary": "Retrieve all OrderDetails",
+                "summary": "Updates a  OrderDetail",
+                "parameters": [
+                    {
+                        "description": "order_number",
+                        "name": "customer",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.OrderDetail"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -402,7 +550,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/orders/get_orders": {
+        "/orders/orders": {
             "get": {
                 "produces": [
                     "application/json"
@@ -427,7 +575,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/payments/delete_payment": {
+        "/payments/delete": {
             "delete": {
                 "description": "deletes a Payment",
                 "produces": [
@@ -462,7 +610,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/payments/get_payment": {
+        "/payments/get": {
             "get": {
                 "description": "Fetch a Payment",
                 "produces": [
@@ -471,7 +619,6 @@ const docTemplate = `{
                 "tags": [
                     "Payments"
                 ],
-                "summary": "Retrieve a  Payment",
                 "parameters": [
                     {
                         "type": "integer",
@@ -497,15 +644,27 @@ const docTemplate = `{
                 }
             }
         },
-        "/payments/get_payments": {
-            "get": {
+        "/payments/update": {
+            "patch": {
+                "description": "updates a single Employee",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Payments"
                 ],
-                "summary": "Retrieve all Payments",
+                "summary": "Updates a  Payment",
+                "parameters": [
+                    {
+                        "description": "payment_date",
+                        "name": "payment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Payment"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -547,7 +706,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/products/delete_product": {
+        "/products/delete": {
             "delete": {
                 "description": "Deletes a single Product",
                 "produces": [
@@ -582,7 +741,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/products/get_product": {
+        "/products/get": {
             "get": {
                 "description": "Fetch a single Product",
                 "produces": [
@@ -617,7 +776,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/products/get_products": {
+        "/products/products": {
             "get": {
                 "produces": [
                     "application/json"
@@ -641,13 +800,50 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/products/update": {
+            "patch": {
+                "description": "updates a single Product",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Updates a  Product",
+                "parameters": [
+                    {
+                        "description": "quantity_in_stock",
+                        "name": "product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Product"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Product"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrValidation"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
         "model.Customer": {
             "type": "object",
             "properties": {
-                "address_line": {
+                "address_line1": {
                     "type": "string"
                 },
                 "address_line2": {
@@ -673,6 +869,9 @@ const docTemplate = `{
                 },
                 "customer_number": {
                     "type": "integer"
+                },
+                "email": {
+                    "type": "string"
                 },
                 "phone": {
                     "type": "string"

@@ -2,12 +2,17 @@ package api
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 
 	"dev.azure.com/jjoogam/Ecommerce-core/api/middleware"
+	"dev.azure.com/jjoogam/Ecommerce-core/internal/metrics"
 	"dev.azure.com/jjoogam/Ecommerce-core/internal/repository"
 	"dev.azure.com/jjoogam/Ecommerce-core/model"
+	"emperror.dev/errors"
 	"github.com/jackc/pgx/v4"
 	"github.com/labstack/echo/v4"
 )
@@ -22,6 +27,7 @@ type (
 		GetEmployees(ctx context.Context) ([]model.Employee, error)
 		FindEmployee(ctx context.Context, employeeNumber int) (*model.Employee, error)
 		DeleteEmployee(ctx context.Context, employeeNumber int) error
+		UpdateEmployee(ctx context.Context, employee model.Employee) error
 	}
 
 	EmployeeQueryRepositoryFactory func(pgx.Tx) EmployeeQueryRepository
@@ -45,9 +51,10 @@ func (a *EmployeeController) WithQueryRepository(f EmployeeQueryRepositoryFactor
 
 func (a *EmployeeController) RegisterRoutes(e *echo.Echo) {
 	employeeGroup := e.Group("/employees", middleware.Transaction(a.txProvider))
-	employeeGroup.GET("/get_employees", a.GetEmployees)
-	employeeGroup.GET("/get_employee", a.findemployee)
-	employeeGroup.DELETE("/delete_employee", a.deleteEmployee)
+	employeeGroup.GET("/employees", a.GetEmployees)
+	employeeGroup.GET("/get", a.findemployee)
+	employeeGroup.DELETE("/delete", a.deleteEmployee)
+	employeeGroup.PATCH("/update", a.UpdateEmployee)
 
 }
 
@@ -55,7 +62,7 @@ func (a *EmployeeController) RegisterRoutes(e *echo.Echo) {
 // @Description Gets all Employees
 // @Tags Employees
 // @Produce json
-// @Router /employees/get_employees [get]
+// @Router /employees/employees [get]
 // @Success 200 {object} model.Employee
 // @Failure 400 {object} model.ErrValidation
 func (a *EmployeeController) GetEmployees(c echo.Context) error {
@@ -79,7 +86,7 @@ func (a *EmployeeController) GetEmployees(c echo.Context) error {
 // @Description Fetch a single Employee
 // @Tags Employees
 // @Produce json
-// @Router /employees/get_employee [get]
+// @Router /employees/get [get]
 // @Param employee_number query int true "employee_number mandatory"
 // @Success 200 {object} model.Employee
 // @Failure 400 {object} model.ErrValidation
@@ -107,7 +114,7 @@ func (a *EmployeeController) findemployee(c echo.Context) error {
 // @Description deleted a single Employee
 // @Tags Employees
 // @Produce json
-// @Router /employees/delete_employee [delete]
+// @Router /employees/delete [delete]
 // @Param employee_number query int true "employee_number mandatory"
 // @Success 200 {object} model.Employee
 // @Failure 400 {object} model.ErrValidation
@@ -150,4 +157,43 @@ func (h *EmployeeController) decodeEmployee(c echo.Context) (*int, error) {
 	}
 
 	return &cuId, nil
+}
+
+// @Summary Updates a  Employee
+// @Description updates a single Employee
+// @Tags Employees
+// @Produce json
+// @Router /employees/update [patch]
+// @Param customer body model.Employee true "employee_number"
+// @Success 200 {object} model.Employee
+// @Failure 400 {object} model.ErrValidation
+func (a *EmployeeController) UpdateEmployee(c echo.Context) error {
+	ctx := context.Background()
+	db, err := middleware.FromTransactionContext(c)
+	if err != nil {
+		metrics.DBErrorInc()
+		return errors.Wrap(err, "unable to resolve transaction")
+	}
+	r := a.queryRepositoryFactory(db)
+	requestbody, err := ioutil.ReadAll(c.Request().Body)
+
+	var request model.Employee
+	err = json.Unmarshal(requestbody, &request)
+	if err != nil {
+		return err
+	}
+	if err != nil {
+
+		return errors.Wrap(err, "error getting employee information from the request")
+	}
+
+	if request.Email == "" {
+		return model.ErrValidation{InvalidParams: []model.InvalidParam{{Name: "email", Reason: "email is a mandatory attribute and cannot be 0"}}}
+	}
+	err = r.UpdateEmployee(ctx, request)
+	if err != nil {
+		return fmt.Errorf("Error in the request", err.Error())
+	}
+	return c.String(http.StatusOK, "Employee updated successfully")
+
 }

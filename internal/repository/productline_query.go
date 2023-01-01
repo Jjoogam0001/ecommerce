@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"dev.azure.com/jjoogam/Ecommerce-core/internal/metrics"
+	"time"
 
 	"dev.azure.com/jjoogam/Ecommerce-core/model"
 	"github.com/jackc/pgx/v4"
@@ -18,7 +20,7 @@ func NewProductLineQueryRepository(db pgx.Tx) *ProductLineQueryRepository {
 }
 
 func (r *ProductLineQueryRepository) GetProductLines(ctx context.Context) ([]model.ProductLine, error) {
-
+	defer metrics.DBCallSince(time.Now())
 	productLines := []model.ProductLine{}
 	query := `SELECT  product_line, text_description , image FROM product_lines;`
 	rows, err := r.db.Query(ctx, query)
