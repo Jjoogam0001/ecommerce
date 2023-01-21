@@ -1,5 +1,5 @@
 make --dry-run --always-make --keep-going --print-directory
-make: Entering directory `/Users/martinj/projects/src/ecommerce'
+make: Entering directory `/Users/martinj/Desktop/personal jects'
 make: `local-env' is up to date.
-make: Leaving directory `/Users/martinj/projects/src/ecommerce'
+make: Leaving directory `/Users/martinj/Desktop/personal jects'
  

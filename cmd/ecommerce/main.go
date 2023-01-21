@@ -28,6 +28,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	config.RunMigration(ctx, c.Database.ConnectionString, "migrations")
 	if err := api.NewAPI(c).UsingDefaultControllers(pool).Start(c.HTTPServer.Addr); err != nil {
 		log.Fatal(err)
 	}

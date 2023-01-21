@@ -18,6 +18,7 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/labstack/gommon/log"
+	"github.com/pressly/goose"
 )
 
 // AppConfig contains the application configuration.
@@ -187,4 +188,44 @@ func findPath(target string, dir string) (string, error) {
 	}
 
 	return findPath(target, filepath.Dir(dir))
+}
+
+func preMigrationsCheck(db *sql.DB) (bool, error) {
+
+	dbVersion, err := goose.GetDBVersion(db)
+	if err != nil {
+		return false, err
+	}
+
+	if dbVersion != 0 {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+func RunMigration(ctx context.Context, conf string, path string) error {
+	db, err := sql.Open("pgx", conf)
+	if err != nil {
+		return errors.Wrap(err, "error connecting")
+	}
+	defer db.Close()
+
+	pmc, err := preMigrationsCheck(db)
+	if err != nil {
+		return errors.Wrap(err, "error running premigrations")
+	}
+	if pmc {
+		log.Info(ctx, "database schema is updated")
+	}
+
+	cwd, _ := os.Getwd()
+	dirPath, _ := findPath(path, cwd)
+
+	if err := goose.Run("up", db, dirPath); err != nil {
+		return errors.Wrapf(err, "error migrating from cwd path %s", cwd)
+	}
+
+	return nil
+
 }
